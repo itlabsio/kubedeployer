@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${SERVICE_NAME}
+spec:
+  selector:
+    app: ${SERVICE_NAME}
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${SERVICE_NAME}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${SERVICE_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${SERVICE_NAME}
+    spec:
+      initContainers:
+        - name: ${SERVICE_NAME}-migrations
+          image: ${SERVICE_IMAGE}
+          command: ['migrate']
+      containers:
+        - name: ${SERVICE_NAME}-server
+          image: ${SERVICE_IMAGE}
+          ports:
+            - name: backend
+              containerPort: 8080
+        - name: nginx
+          image: nginx:1.15
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80

@@ -1,0 +1,28 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${HOST_NAME}-${SERVICE_NAME}
+  namespace: ${NAMESPACE}
+  annotations:
+    ingressType: admin
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.id/force-ssl-redirect: "true"
+    ingress.kubernetes.io/proxy-redirect-from: ~*^(?!http:|https:)(/${SERVICE_NAME}/?)?(.*)$
+    ingress.kubernetes.io/proxy-redirect-to: /${SERVICE_NAME}/$2
+spec:
+  tls:
+    - hosts:
+        - ${HOST_NAME}
+      secretName: tls
+  rules:
+    - host: ${HOST_NAME}
+      http:
+        paths:
+          - path: /${SERVICE_NAME}
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ${SERVICE_NAME}
+                port:
+                  name: http
