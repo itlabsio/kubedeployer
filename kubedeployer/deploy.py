@@ -78,6 +78,9 @@ def config_kubectl():
         ))
         kube_token = settings.kube_token.value
 
+    if not kube_token:
+        raise ValueError("Token for Kubernetes is not set.")
+
     k8s.configure(
         server=kube_url,
         token=kube_token,
