@@ -8,6 +8,6 @@ class TrivyReport:
         self._scanner = scanner
         self._formatter = formatter
 
-    def build(self, image: str):
-        content = self._scanner.scan(image)
+    def build(self, image: str, subprocess_timeout: int = 0):
+        content = self._scanner.scan(image, subprocess_timeout)
         return self._formatter.format(image, content)

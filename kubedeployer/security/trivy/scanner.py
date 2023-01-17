@@ -11,7 +11,7 @@ from kubedeployer.security.trivy.errors import TrivyError, TrivyContentError
 class TrivyScanner:
 
     @staticmethod
-    def __scan(image: str) -> str:
+    def __scan(image: str, subprocess_timeout: int = 0) -> str:
         cmd = (
             f"trivy --quiet image "
             f"--severity HIGH,CRITICAL "
@@ -19,7 +19,8 @@ class TrivyScanner:
             f"--timeout 10m0s "
             f"{image}"
         )
-        result = subprocess.run(cmd, capture_output=True, shell=True)
+        result = subprocess.run(cmd, capture_output=True, shell=True,
+                                timeout=subprocess_timeout)
         if result.returncode != 0:
             raise TrivyError(result.stderr.decode("utf-8"))
         return result.stdout.decode("utf-8")
