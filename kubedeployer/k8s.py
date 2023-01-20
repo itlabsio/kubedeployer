@@ -115,7 +115,7 @@ def diff_manifests(manifests_dir: PathLike):
 
     cmd = (
         f"kubectl diff"
-        f" -k {manifests_dir}"
+        f" -f {manifests_dir}"
     )
     result = subprocess.run(cmd, capture_output=True, shell=True)
     if result.returncode != 1:

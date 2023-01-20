@@ -91,17 +91,16 @@ def test_raises_rollout_status_for_invalid_resource(manifests):
 def test_diff_manifests():
     path = Path(__file__).parent / "data/apps/kustomize-app"
     result = diff_manifests(
-        path / "base"
+        path / "base/deployment.yamk"
     )
 
     assert "diff -u -N" in result
     assert "+kind: Deployment" in result
-    assert "+kind: Service" in result
 
 
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
 def test_diff_manifests():
     path = Path(__file__).parent / "data/apps/kustomize-app"
 
-    with pytest.raises(KubectlError, match="not a valid directory"):
-        diff_manifests(path / "no_dir")
+    with pytest.raises(KubectlError, match="does not exist"):
+        diff_manifests(path / "base/no_manifest.yaml")
