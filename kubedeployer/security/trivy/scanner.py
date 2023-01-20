@@ -35,6 +35,6 @@ class TrivyScanner:
         except Exception as e:
             raise TrivyError(e)
 
-    def scan(self, image: str) -> TrivyContent:
-        content = self.__scan(image)
+    def scan(self, image: str, subprocess_timeout) -> TrivyContent:
+        content = self.__scan(image, subprocess_timeout)
         return self.__format(content)
