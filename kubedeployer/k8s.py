@@ -100,3 +100,24 @@ def check_rollout_status(manifest: Manifest) -> str:
     if result.returncode != 0:
         raise KubectlError(result.stderr.decode("utf-8"))
     return result.stdout.decode("utf-8")
+
+
+def diff_manifests(manifests_dir: PathLike):
+    """
+    Diff manifests
+
+    Example:
+
+        >>> diff_manifests("/proj/manifests/")
+    """
+    if not manifests_dir:
+        raise KubectlError("manifests directory not found")
+
+    cmd = (
+        f"kubectl diff"
+        f" -k {manifests_dir}"
+    )
+    result = subprocess.run(cmd, capture_output=True, shell=True)
+    if result.returncode != 1:
+        raise KubectlError(result.stderr.decode("utf-8"))
+    return result.stdout.decode("utf-8")
