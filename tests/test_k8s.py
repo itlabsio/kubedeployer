@@ -6,7 +6,7 @@ from unittest import mock
 import pytest
 
 from kubedeployer.k8s import configure, apply_manifests, KubectlError, \
-    check_rollout_status
+    check_rollout_status, diff_manifests
 from kubedeployer.manifests import get_manifests, InvalidRolloutResource
 
 
@@ -85,3 +85,23 @@ def test_raises_applying_with_unsupported_yaml():
 def test_raises_rollout_status_for_invalid_resource(manifests):
     with pytest.raises(InvalidRolloutResource):
         check_rollout_status(manifests.pop())
+
+
+@pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
+def test_diff_manifests():
+    path = Path(__file__).parent / "data/apps/kustomize-app"
+    result = diff_manifests(
+        path / "base"
+    )
+
+    assert "diff -u -N" in result
+    assert "+kind: Deployment" in result
+    assert "+kind: Service" in result
+
+
+@pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
+def test_diff_manifests():
+    path = Path(__file__).parent / "data/apps/kustomize-app"
+
+    with pytest.raises(KubectlError, match="not a valid directory"):
+        diff_manifests(path / "no_dir")

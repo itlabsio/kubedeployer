@@ -195,6 +195,10 @@ def run():
         stage("Scanning manifests..")
         print_kubesec_report(manifests_filename)
 
+        stage("Diff manifests..")
+        diffed_manifests = k8s.diff_manifests(tmp_path)
+        console.writeln(indent(diffed_manifests, prefix=TAB))
+
         stage("Apply manifests..")
         applied_manifests = k8s.apply_manifests(manifests_filename)
         console.writeln(indent(applied_manifests, prefix=TAB))
