@@ -31,8 +31,8 @@ class TrivyConsoleStringFormatter(TrivyFormatter):
         ]
         self._columns_aligns = ["c", "c", "c", "l"]
 
-    def __create_table(self) -> PrettyTable:
-        table = PrettyTable(field_names=[c for c in self._columns])
+    def _create_table(self) -> PrettyTable:
+        table = PrettyTable(field_names=list(self._columns))
         table.max_width = self._max_width
         table.valign[""] = "t"
         table.sortby = "Severity"
@@ -42,11 +42,11 @@ class TrivyConsoleStringFormatter(TrivyFormatter):
             table.align[column] = align
         return table
 
-    def __format_image(self, image: str) -> str:
+    def _format_image(self, image: str) -> str:
         return f"Scan image: {image}\n"
 
-    def __format_content(self, content: TrivyContent) -> str:
-        table = self.__create_table()
+    def _format_content(self, content: TrivyContent) -> str:
+        table = self._create_table()
         for r in content.results:
             for v in r.vulnerabilities:
                 table.add_row([
@@ -62,6 +62,6 @@ class TrivyConsoleStringFormatter(TrivyFormatter):
 
     def format(self, image: str, content: TrivyContent) -> str:
         return "\n".join([
-            self.__format_image(image),
-            indent(self.__format_content(content), prefix=TAB),
+            self._format_image(image),
+            indent(self._format_content(content), prefix=TAB),
         ])

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from distutils.util import strtobool
 from typing import Union, Optional
+
+from kubedeployer.utils.convert import str_to_bool
 
 
 @dataclass
@@ -27,7 +28,7 @@ class BaseVariable:
 
     def to_bool(self) -> 'BoolVariable':
         if isinstance(self.value, str):
-            value = bool(strtobool(self.value))
+            value = bool(str_to_bool(self.value))
         elif isinstance(self.value, int):
             value = bool(self.value)
         else:

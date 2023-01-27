@@ -32,4 +32,3 @@ class KubeSecurityScanner:
     def scan(self, filename: PathLike) -> KubeSecurityContent:
         content = self.__scan(filename)
         return self.__format(content)
-

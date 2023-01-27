@@ -115,7 +115,7 @@ def print_trivy_report(*images: str):
 
     try:
         report = create_trivy_report()
-        subprocess_timeout = os.getenv("SUBPROCESS_TIMEOUT", 1)
+        subprocess_timeout = int(os.getenv("SUBPROCESS_TIMEOUT", "1"))
         for i in images:
             data = report.build(i, subprocess_timeout)
             console.writeln(indent(data, prefix=TAB))
