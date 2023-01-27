@@ -11,7 +11,7 @@ from kubedeployer.manifests import get_manifests, InvalidRolloutResource
 
 
 def is_kubectl_not_found() -> bool:
-    cmd = "kubectl help"
+    cmd = "kubectl get deployments"
     result = subprocess.run(cmd, shell=True)
     return result.returncode != 0
 

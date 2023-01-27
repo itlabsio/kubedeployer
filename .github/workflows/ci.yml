@@ -40,16 +40,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.10.7
-
-      - name: Setup dependencies
-        run: pip install -r requirements.txt
+      - name: Build docker image
+        run: docker build -t kubedeployer-unit-tests
 
       - name: Run unit-tests
-        run: pytest ./tests/unit/
+        run: docker run -it kubedeployer-unit-tests pytest ./tests/unit
 
   push-to-registry:
     name: Push Docker image to Docker Hub
