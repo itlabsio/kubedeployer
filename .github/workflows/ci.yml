@@ -41,10 +41,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build docker image
-        run: docker build -t kubedeployer-unit-tests .
+        run: docker build -t deployer-unit-tests .
 
       - name: Run unit-tests
-        run: docker run -it kubedeployer-unit-tests pytest ./tests/unit
+        run: docker run --rm -v $PWD:/srv -i deployer-unit-tests pytest /srv/tests/unit/
 
   push-to-registry:
     name: Push Docker image to Docker Hub
