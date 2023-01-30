@@ -120,7 +120,7 @@ def diff_manifests(manifests_dir: PathLike):
     )
     result = subprocess.run(cmd, capture_output=True, shell=True)
     if result.returncode != 1:
-        error = f"returncode == %s, %s" % (
+        error = "returncode == %s, %s" % (
             result.returncode,
             result.stderr.decode("utf-8"),
         )
