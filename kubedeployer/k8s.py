@@ -115,9 +115,14 @@ def diff_manifests(manifests_dir: PathLike):
 
     cmd = (
         f"kubectl diff"
+        f" --v={settings.kube_verbosity.value}"
         f" -f {manifests_dir}"
     )
     result = subprocess.run(cmd, capture_output=True, shell=True)
     if result.returncode != 1:
-        raise KubectlError(result.stderr.decode("utf-8"))
+        error = f"returncode == %s, %s" % (
+            result.returncode,
+            result.stderr.decode("utf-8"),
+        )
+        raise KubectlError(error)
     return result.stdout.decode("utf-8")
