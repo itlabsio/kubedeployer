@@ -1,5 +1,4 @@
 import subprocess
-from pathlib import Path
 
 import pytest
 
@@ -14,33 +13,31 @@ def is_kustomize_not_found() -> bool:
     return result.returncode != 0
 
 
-def test_get_kustomization_file():
-    path = Path(__file__).parent / "data/apps/kustomize-app/overlays/production"
+def test_get_kustomization_file(data_path):
+    path = data_path / "apps/kustomize-app/overlays/stage"
 
     filename = str(get_kustomization(path))
-    assert "kustomize-app/overlays/production/kustomization.yaml" in filename
+    assert "kustomize-app/overlays/stage/kustomization.yaml" in filename
 
 
-def test_get_kustomization_file_in_multiple_locations():
+def test_get_kustomization_file_in_multiple_locations(data_path):
     paths = (
-        Path(__file__).parent / "data/apps/kustomize-app",
-        Path(__file__).parent / "data/apps/kustomize-app/overlays/production",
+        data_path / "apps/kustomize-app",
+        data_path / "apps/kustomize-app/overlays/stage",
     )
 
     filename = str(get_kustomization(*paths))
-    assert "kustomize-app/overlays/production/kustomization.yaml" in filename
+    assert "kustomize-app/overlays/stage/kustomization.yaml" in filename
 
 
-def test_raises_to_many_kustomization_files():
-    path = Path(__file__).parent / "data/apps/kustomize-app/**/"
-
+def test_raises_to_many_kustomization_files(data_path):
     with pytest.raises(KustomizationError, match="There are to many files"):
-        get_kustomization(path)
+        get_kustomization(data_path / "apps/kustomize-app/**/")
 
 
 @pytest.mark.skipif(is_kustomize_not_found(), reason="kustomize not found")
-def test_create_kustomization_file(tmp_path):
-    manifests_path = Path(__file__).parent / "data/apps/env-app/**"
+def test_create_kustomization_file(tmp_path, data_path):
+    manifests_path = data_path / "apps/env-app/**"
     manifests_files = get_files(manifests_path, extensions=YAML_EXTENSIONS)
 
     kustomization = create_kustomization(tmp_path, *manifests_files)
@@ -88,8 +85,8 @@ def test_raises_on_add_empty_annotations_into_kustomization_file(tmp_path):
 
 
 @pytest.mark.skipif(is_kustomize_not_found(), reason="kustomize not found")
-def test_build_manifests_by_kustomization_file(tmp_path):
-    path = Path(__file__).parent / "data/apps/kustomize-app/overlays/production"
+def test_build_manifests_by_kustomization_file(tmp_path, data_path):
+    path = data_path / "apps/kustomize-app/overlays/stage"
 
     build_manifests(path, tmp_path / "manifests.yaml")
 
@@ -98,4 +95,4 @@ def test_build_manifests_by_kustomization_file(tmp_path):
 
         assert "kind: Deployment" in content
         assert "kind: Service" in content
-        assert "kind: Ingress" in content
+        assert "kind: ConfigMap" in content

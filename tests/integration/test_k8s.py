@@ -1,6 +1,5 @@
 import os
 import subprocess
-from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -27,9 +26,8 @@ def kubeconfig(tmp_path):
 
 
 @pytest.fixture
-def manifests():
-    path = Path(__file__).parent
-    with open(path / "data/manifests/manifests.yaml", "r") as f:
+def manifests(data_path):
+    with open(data_path / "manifests/manifests.yaml", "r") as f:
         content = f.read()
         return list(get_manifests(content, kind="Service"))
 
@@ -53,18 +51,18 @@ def test_configure_kubectl(kubeconfig):
 
 
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
-def test_apply_manifests():
-    path = Path(__file__).parent / "data/apps/kustomize-app"
+def test_apply_manifests(data_path):
+    path = data_path / "apps/kustomize-app"
     result = apply_manifests(
         path / "base/deployment.yaml",
         path / "base/service.yaml",
-        path / "overlays/production/ingress.yaml",
+        path / "overlays/stage/configmap.yaml",
         dry_run=True
     )
 
-    assert "service/application created" in result
-    assert "deployment.apps/application created" in result
-    assert "ingress.networking.k8s.io/local-application created" in result
+    assert "service/kustomize-app created" in result
+    assert "deployment.apps/kustomize-app created" in result
+    assert "configmap/kustomize-app created" in result
 
 
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
@@ -74,9 +72,8 @@ def test_raises_applying_with_empty_manifests():
 
 
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
-def test_raises_applying_with_unsupported_yaml():
-    path = Path(__file__).parent
-    unsupported_yaml = path / "data/apps/kustomize-app/base/kustomization.yaml"
+def test_raises_applying_with_unsupported_yaml(data_path):
+    unsupported_yaml = data_path / "apps/kustomize-app/base/kustomization.yaml"
     with pytest.raises(KubectlError, match="no matches for kind"):
         apply_manifests(unsupported_yaml, dry_run=True)
 
@@ -88,10 +85,9 @@ def test_raises_rollout_status_for_invalid_resource(manifests):
 
 
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
-def test_diff_manifests():
-    path = Path(__file__).parent / "data/apps/kustomize-app"
+def test_diff_manifests(data_path):
     result = diff_manifests(
-        path / "base/deployment.yaml"
+        data_path / "apps/kustomize-app/base/deployment.yaml"
     )
 
     assert "diff -u -N" in result
@@ -99,8 +95,6 @@ def test_diff_manifests():
 
 
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
-def test_diff_manifests_manifest_does_not_exist():
-    path = Path(__file__).parent / "data/apps/kustomize-app"
-
+def test_diff_manifests_manifest_does_not_exist(data_path):
     with pytest.raises(KubectlError, match="does not exist"):
-        diff_manifests(path / "base/no_manifest.yaml")
+        diff_manifests(data_path / "apps/kustomize-app/base/no_manifest.yaml")

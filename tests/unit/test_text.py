@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 import pytest
 from unittest import mock
@@ -58,9 +57,8 @@ def test_envsubst_ignore_variables_with_unknown_forms():
     assert envsubst(text) == "$$IGNORED_VARIABLE"
 
 
-def test_envsubst_replace_variables_in_file():
-    path = Path(__file__).parent
-    with open(path / "data/manifests/env-manifest.yaml", "r") as f:
+def test_envsubst_replace_variables_in_file(data_path):
+    with open(data_path / "manifests/env-manifest.yaml", "r") as f:
         retrieved = envsubst(f.read())
 
         assert "name: host.local-example" in retrieved
