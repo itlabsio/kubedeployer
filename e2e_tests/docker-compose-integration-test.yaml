@@ -1,0 +1,18 @@
+version: '3.6'
+
+services:
+  tester:
+    build:
+      context: ../
+      dockerfile: ../Dockerfile.tests
+    networks:
+      - kind
+    command: pytest -m integration
+    environment:
+      KUBE_URL: 0.0.0.0
+      KUBE_TOKEN: $KUBE_TOKEN
+      KUBE_NAMESPACE: default
+
+networks:
+  kind:
+    external: true
