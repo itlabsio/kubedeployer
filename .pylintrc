@@ -23,6 +23,7 @@ disable=broad-except, #W0703
         raise-missing-from, #W0707
         subprocess-run-check, #W1510
         too-many-locals, #R0914
+        too-many-statements, #R0915
         too-few-public-methods, #R0903
         too-many-public-methods, #R0904
 
