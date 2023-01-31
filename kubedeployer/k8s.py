@@ -119,9 +119,7 @@ def diff_manifests(manifests_dir: PathLike):
         f" -f {manifests_dir}"
     )
     result = subprocess.run(cmd, capture_output=True, shell=True)
-    # `kubectl diff` при успехе отвечает с кодом 1,
-    # но `subprocess.run` не знает про эти заморочки.
-    # Возможно ответ не там где мы ожидаем, но он точно в stdout или stderr.
+    # `kubectl diff` on success return 1, but `subprocess.run` don't know about it.
     result_message = result.stdout or result.stderr
     if result.returncode != 1:
         error = "returncode == %s, %s" % (
