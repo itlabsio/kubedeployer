@@ -53,6 +53,9 @@ def get_manifests_paths() -> List[PathLike]:
     project_path = Path(settings.ci_project_dir.value)
     manifests_path = project_path / f"{settings.manifest_folder.value}"
 
+    if not manifests_path.exists():
+        raise FileExistsError(f"Manifest folder {manifests_path} doesn't exist")
+
     paths = [manifests_path]
 
     if settings.environment.value:
@@ -140,14 +143,20 @@ def run():
         stage("Searching kustomization..")
         kustomization = get_kustomization(*manifests_paths)
         if not kustomization:
+            manifests_files = list(
+                get_files(*manifests_paths, extensions=YAML_EXTENSIONS)
+            )
+
+            if not manifests_files:
+                raise FileExistsError(
+                    f"Manifests files not found in "
+                    f"{', '.join(str(p) for p in manifests_paths)}"
+                )
+
             console.writeln(indent(
                 "Kustomization not found, creating..",
                 prefix=TAB
             ))
-
-            manifests_files = get_files(
-                *manifests_paths, extensions=YAML_EXTENSIONS
-            )
             kustomization = create_kustomization(
                 Path(settings.ci_project_dir.value) /
                 f"{settings.manifest_folder.value}",
