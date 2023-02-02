@@ -20,6 +20,7 @@ prepare_infrastructure() {
   echo "SECRET ", secret
   touch env_vars
   echo KUBE_TOKEN=$secret >> env_vars
+  echo KUBE_URL="https://${REAL_IP}:6443" >> env_vars
   cat env_vars
 }
 

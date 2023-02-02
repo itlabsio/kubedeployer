@@ -11,10 +11,10 @@ def data_path() -> Path:
 
 
 @pytest.fixture
-def kubeconfig(tmp_path):
+def kube_config(tmp_path):
     config = tmp_path / "config"
     config.touch()
 
     variables = {"KUBECONFIG": str(config)}
-    with mock.patch.dict(os.environ, **variables):
+    with mock.patch.dict(os.environ, variables):
         yield

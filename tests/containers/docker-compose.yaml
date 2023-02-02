@@ -9,7 +9,7 @@ services:
       - kind
     command: pytest ./tests/integration
     environment:
-      KUBE_URL: 0.0.0.0
+      KUBE_URL: $KUBE_URL
       KUBE_TOKEN: $KUBE_TOKEN
       KUBE_NAMESPACE: default
 
