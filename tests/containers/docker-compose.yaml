@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     networks:
       - kind
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: pytest ./tests/integration
     environment:
       KUBE_URL: $KUBE_URL
