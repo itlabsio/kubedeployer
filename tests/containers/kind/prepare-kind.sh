@@ -4,11 +4,11 @@ prepare_kind() {
   apk add -U wget
   apk add -U gettext
 
-  # установка kind
+  # Install kind
   wget -O /usr/local/bin/kind https://github.com/kubernetes-sigs/kind/releases/download/${KIND}/kind-linux-amd64
   chmod +x /usr/local/bin/kind
 
-  # установка kubectl
+  # Install kubectl
   wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBECTL}/bin/linux/amd64/kubectl
   chmod +x /usr/local/bin/kubectl
 }
@@ -25,8 +25,8 @@ prepare_cluster() {
     export REAL_IP=$(ip route|awk '/default/ { print $3 }')
   fi
   echo "REAL_IP", $REAL_IP
-  sed -i -E -e "s/here_should_be_real_ip/$REAL_IP/g" "e2e_tests/kind/kind-config.yaml"
-  kind create cluster --config=./e2e_tests/kind/kind-config.yaml
+  sed -i -E -e "s/here_should_be_real_ip/$REAL_IP/g" "tests/containers/kind/config.yaml"
+  kind create cluster --config=./tests/containers/kind/config.yaml
   sed -i -E -e "s/localhost|0\.0\.0\.0/$REAL_IP/g" "$HOME/.kube/config"
 }
 

@@ -3,11 +3,11 @@ version: '3.6'
 services:
   tester:
     build:
-      context: ../
-      dockerfile: ../Dockerfile.tests
+      context: ../..
+      dockerfile: Dockerfile
     networks:
       - kind
-    command: pytest -m integration
+    command: pytest ./tests/integration
     environment:
       KUBE_URL: 0.0.0.0
       KUBE_TOKEN: $KUBE_TOKEN

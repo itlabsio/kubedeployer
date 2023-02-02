@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: no-kustomize-app
+  name: non-kustomize-app
 data:
   NGINX_HOST: "example.local"
   NGINX_PORT: "80"

@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: no-kustomize-app
+  name: non-kustomize-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: no-kustomize-app
+      app: non-kustomize-app
   template:
     metadata:
       labels:
-        app: no-kustomize-app
+        app: non-kustomize-app
     spec:
       containers:
         - name: nginx
@@ -24,10 +24,10 @@ spec:
             - name: NGINX_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: no-kustomize-app
+                  name: non-kustomize-app
                   key: NGINX_HOST
             - name: NGINX_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: no-kustomize-app
+                  name: non-kustomize-app
                   key: NGINX_PORT

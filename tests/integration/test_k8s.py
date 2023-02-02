@@ -1,6 +1,4 @@
-import os
 import subprocess
-from unittest import mock
 
 import pytest
 
@@ -13,16 +11,6 @@ def is_kubectl_not_found() -> bool:
     cmd = "kubectl get deployments"
     result = subprocess.run(cmd, shell=True)
     return result.returncode != 0
-
-
-@pytest.fixture
-def kubeconfig(tmp_path):
-    config = tmp_path / "config"
-    config.touch()
-
-    variables = {"KUBECONFIG": str(config)}
-    with mock.patch.dict(os.environ, variables):
-        yield
 
 
 @pytest.fixture
@@ -52,7 +40,7 @@ def test_configure_kubectl(kubeconfig):
 
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
 def test_apply_manifests(data_path):
-    path = data_path / "apps/kustomize-app"
+    path = data_path / "manifests/apps/kustomize-app"
     result = apply_manifests(
         path / "base/deployment.yaml",
         path / "base/service.yaml",
@@ -73,7 +61,7 @@ def test_raises_applying_with_empty_manifests():
 
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
 def test_raises_applying_with_unsupported_yaml(data_path):
-    unsupported_yaml = data_path / "apps/kustomize-app/base/kustomization.yaml"
+    unsupported_yaml = data_path / "manifests/apps/kustomize-app/base/kustomization.yaml"
     with pytest.raises(KubectlError, match="no matches for kind"):
         apply_manifests(unsupported_yaml, dry_run=True)
 
@@ -87,7 +75,7 @@ def test_raises_rollout_status_for_invalid_resource(manifests):
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
 def test_diff_manifests(data_path):
     result = diff_manifests(
-        data_path / "apps/kustomize-app/base/deployment.yaml"
+        data_path / "manifests/apps/kustomize-app/base/deployment.yaml"
     )
 
     assert "diff -u -N" in result
@@ -97,4 +85,4 @@ def test_diff_manifests(data_path):
 @pytest.mark.skipif(is_kubectl_not_found(), reason="kubectl not found")
 def test_diff_manifests_manifest_does_not_exist(data_path):
     with pytest.raises(KubectlError, match="does not exist"):
-        diff_manifests(data_path / "apps/kustomize-app/base/no_manifest.yaml")
+        diff_manifests(data_path / "manifests/non-existent-manifest.yaml")

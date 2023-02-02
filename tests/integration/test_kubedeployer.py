@@ -30,16 +30,16 @@ def deployer(**override_variables):
 
 
 @pytest.mark.skip
-def test_apply_only_manifests():
+def test_apply_only_manifests(kubeconfig):
     pass
 
 
 @pytest.mark.skip
-def test_apply_manifests_using_kustomization():
+def test_apply_manifests_using_kustomization(kubeconfig):
     pass
 
 
-def test_raises_on_applying_if_manifest_folder_not_exist(tmp_path):
+def test_raises_on_applying_if_manifest_folder_not_exist(tmp_path, kubeconfig):
     with pytest.raises(FileExistsError, match="folder .* doesn't exist"):
         variables = {
             "CI_PROJECT_DIR": str(tmp_path),
@@ -50,7 +50,7 @@ def test_raises_on_applying_if_manifest_folder_not_exist(tmp_path):
             d.run()
 
 
-def test_raises_on_applying_if_manifests_files_not_found(tmp_path):
+def test_raises_on_applying_if_manifests_files_not_found(tmp_path, kubeconfig):
     with pytest.raises(FileExistsError, match="Manifests files not found"):
         (tmp_path / "empty-project").mkdir()
 
