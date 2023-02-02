@@ -62,7 +62,7 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag'
-    needs: [lint, unit-tests]
+    needs: [lint, unit-tests, integration-tests]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -92,7 +92,7 @@ jobs:
     name: Trigger Gitlab pipeline
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [ lint, unit-tests ]
+    needs: [lint, unit-tests, integration-tests]
     steps:
       - name: Run pipeline
         env:
