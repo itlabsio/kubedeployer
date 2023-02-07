@@ -8,11 +8,10 @@ from kubedeployer.security.kubesec.formatters import KubeSecurityConsoleStringFo
 from kubedeployer.security.kubesec.scanner import KubeSecurityScanner
 
 
-def test_scan_file_with_manifests():
-    path = Path(__file__).parent
+def test_scan_file_with_manifests(data_path):
     scanner = KubeSecurityScanner()
 
-    content = scanner.scan(path / "data/manifests/manifests.yaml")
+    content = scanner.scan(data_path / "manifests/manifests.yaml")
 
     assert len(content) == 5
 

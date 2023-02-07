@@ -120,9 +120,10 @@ def diff_manifests(manifests_dir: PathLike):
     )
     result = subprocess.run(cmd, capture_output=True, shell=True)
     if result.returncode != 1:
-        error = "returncode == %s, %s" % (
-            result.returncode,
-            result.stderr.decode("utf-8"),
+        error = (
+            f"return code == "
+            f"{result.returncode}, "
+            f"{result.stderr.decode('utf-8')}"
         )
         raise KubectlError(error)
     return result.stdout.decode("utf-8")

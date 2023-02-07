@@ -1,0 +1,20 @@
+version: '3.6'
+
+services:
+  tester:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    networks:
+      - kind
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: pytest ./tests/integration
+    environment:
+      KUBE_URL: $KUBE_URL
+      KUBE_TOKEN: $KUBE_TOKEN
+      KUBE_NAMESPACE: default
+
+networks:
+  kind:
+    external: true

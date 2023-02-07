@@ -30,7 +30,7 @@ class EnvironmentVariableReader(AbstractVariableReader):
         elif not is_required:
             value = default_value
         else:
-            raise GitlabCiBaseException('Environment variable "{0}" is required'.format(env_name))
+            raise GitlabCiBaseException(f'Environment variable "{env_name}" is required')
         return BaseVariable(name=env_name, value=value)
 
     def read_str(self, env_name: str, is_required: bool = False, default_value: Optional[str] = None) -> StrVariable:

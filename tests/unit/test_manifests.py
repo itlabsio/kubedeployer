@@ -1,14 +1,11 @@
-from pathlib import Path
-
 import pytest
 
 from kubedeployer.manifests import get_images, get_manifests
 
 
 @pytest.fixture
-def content() -> str:
-    path = Path(__file__).parent
-    with open(path / "data/manifests/manifests.yaml", "r") as f:
+def content(data_path) -> str:
+    with open(data_path / "manifests/manifests.yaml", "r") as f:
         yield f.read()
 
 

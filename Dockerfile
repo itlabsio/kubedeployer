@@ -1,4 +1,4 @@
-FROM python:3.10.7-alpine3.16
+FROM python:3.10.7-alpine3.16 AS base
 
 ARG VAULT_URL
 ARG VAULT_APPROLE_ID
@@ -44,3 +44,7 @@ COPY main.py .
 COPY kubedeployer ./kubedeployer
 
 CMD /usr/local/bin/kubedeploy
+
+
+FROM base AS tests
+COPY tests ./tests
