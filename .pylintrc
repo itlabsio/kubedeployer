@@ -1,0 +1,32 @@
+[MASTER]
+
+ignore=CVS, env, tests, migrations
+
+extension-pkg-whitelist=ujson, pydantic
+
+jobs=0
+
+[REPORTS]
+
+output-format=colorized
+
+[MESSAGES CONTROL]
+
+disable=broad-except, #W0703
+        expression-not-assigned, #W0106
+        fixme, #W0511
+        invalid-name, #C0103
+        line-too-long, #C0301
+        missing-module-docstring, #C0114
+        missing-class-docstring, #C0115
+        missing-function-docstring, #C0116
+        raise-missing-from, #W0707
+        subprocess-run-check, #W1510
+        too-many-locals, #R0914
+        too-many-statements, #R0915
+        too-few-public-methods, #R0903
+        too-many-public-methods, #R0904
+
+[DESIGN]
+
+max-parents=15
