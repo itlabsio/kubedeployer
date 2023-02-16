@@ -37,8 +37,7 @@ def subst_env_vars(variables, text):
         variable = matchobj.group(1)
         if variable in variables:
             return os.getenv(variable)
-        else:
-            return matchobj.group(0)
+        return matchobj.group(0)
 
     # TODO: need fix regexp, when $$aaaa (with two dollar signs) won't be replaced, dut $aaaa$bbbb will
     return re.sub(r'\${?([a-zA-Z_][a-zA-Z0-9_]*)}?', repl, text)
@@ -51,11 +50,11 @@ def prepare_manifest_files(files: List[str]):
     for file_path in files:
         file_name = os.path.basename(file_path)
 
-        with open(file_path, 'r') as in_manifest:
+        with open(file_path, 'r', encoding='utf-8') as in_manifest:
             # TODO: it will be a problem when filenames in files have same names
-            # for example stage/ing/obj.yml and stage/svc/obj.yml, in result will be only one file
+            # for example: stage/ing/obj.yml and stage/svc/obj.yml, in result will be only one file
             new_file_path = os.path.join(dest_path, file_name)
-            with open(new_file_path, 'a') as out_manifest:
+            with open(new_file_path, 'a', encoding='utf-8') as out_manifest:
                 for line in in_manifest:
                     prepared_line = subst_env_vars(variables, line)
                     out_manifest.write(prepared_line)
@@ -67,11 +66,11 @@ def add_annotations(file_paths: List[str], dest_path: Path) -> List[str]:
     annotations = k8s.get_annotations()
     prepared_files = []
     for file_path in file_paths:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             file_name = os.path.basename(file_path)
             new_file_path = os.path.join(dest_path, file_name)
             manifest = yaml.safe_load_all(file)
-            with open(new_file_path, 'a') as out_manifest:
+            with open(new_file_path, 'a', encoding='utf-8') as out_manifest:
                 k8s_dict_list = []
                 for k8s_object_dict in manifest:
                     k8s_object = K8sObject(object_as_dict=k8s_object_dict)
