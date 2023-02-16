@@ -29,6 +29,36 @@ authenticate with Vault-defined roles.
 * ***VAULT_SECRETS_PREFIX*** - template of vault-path to secret where store
 connection settings to Kubernetes (ex.: template/to/cluster/*/secret).
 
+## Supported structure maintenance types
+
+Kubedeployer supports three structure maintenance types of manifests to deploy:
+- orthodox
+- smart
+- kustomize
+
+### Orthodox
+
+Process manifest files in `MANIFEST_FOLDER`. In file placeholder like `${VAR_NAME}` will be replaced by corresponding 
+environment variables `VAR_NAME`. If environment variable `ENVIRONMENT` was defined, kubedeployer will also add files 
+from subdirectory with samename as value of this variable.
+All files concatinates in one and it deployes by applying it to kubernetes cluster.
+
+### Smart
+
+It is like orthodox deployer, it replaces placeholders with environment variables. But has another algorithm of 
+collecting files and deploying them.
+
+If in `MANIFEST_FOLDER` were found `kustomization.yaml` file then deployer will collect files by kustomize.
+Else it will create `kustomization.yaml` file with list of files, which were generated like in orthodox deployer.
+Deploy happens by applying `kustomization.yaml`
+
+### Kustomize
+If in `MANIFEST_FOLDER` were found `kustomization.yaml` file then deployer will collect files by kustomize.
+Deploy happens by applying `kustomization.yaml`
+
+Unlike previous deployers this one does not replace placeholders and do not try to guess what can be deployed.
+
+
 ## How to launch in gitlab-ci.yml
 
 ```yaml
@@ -45,6 +75,14 @@ deploy:
     MANIFEST_FOLDER: ./manifests
   script:
     - kubedeploy
+```
+
+script has options to choose deployer type (orthodox, smart and kustomize). Default value is orthodox.
+Example:
+```yaml
+deploy:
+  script:
+    - kubedeploy -d smart
 ```
 
 ### Environments

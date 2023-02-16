@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from unittest import mock
 
@@ -8,6 +9,14 @@ import pytest
 @pytest.fixture
 def data_path() -> Path:
     return Path(__file__).parent / "data"
+
+
+@pytest.fixture
+def tmp_data_path(tmp_path) -> Path:
+    source = Path(__file__).parent / "data"
+    destination = tmp_path / "data"
+    shutil.copytree(source, destination)
+    return destination
 
 
 @pytest.fixture
