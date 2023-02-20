@@ -5,6 +5,7 @@ import random
 import string
 import tempfile
 from pathlib import Path
+from typing import Type
 
 from kubedeployer import console, kubectl
 from kubedeployer.deployer.abstract_deployer import AbstractDeployer
@@ -87,7 +88,7 @@ def print_trivy_report(*images: str):
         console.error(str(e))
 
 
-def run(deployer: AbstractDeployer):
+def run(deployer: Type[AbstractDeployer]):
     try:
         console.stage("Let's deploy it!")
 

@@ -11,7 +11,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-d", "--deployer",
         choices=['orthodox', 'kustomize', 'smart'],
-        default='orthodox',
+        default='smart',
         help="deploy by available choices: orthodox, kustomize or smart, default is orthodox"
     )
     args = parser.parse_args()

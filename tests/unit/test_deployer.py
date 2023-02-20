@@ -1,4 +1,3 @@
-import os
 import tempfile
 from pathlib import Path
 
@@ -8,7 +7,7 @@ import yaml
 from kubedeployer.deployer.kustomize_deployer import KustomizeDeployer
 from kubedeployer.deployer.orthodox_deployer import concat_files, OrthodoxDeployer
 from kubedeployer.deployer.smart_deployer import SmartDeployer
-from tests.unit.mocks import mock_settings
+from tests.mocks import mock_settings
 
 
 @pytest.fixture
@@ -36,9 +35,11 @@ def test_concat_files(file_list):
 
 @pytest.mark.parametrize("deployer", [OrthodoxDeployer, SmartDeployer])
 class TestOrthodoxSmartDeployer:
-    def test_deploy(self, deployer, tmp_data_path):
+    """Tests for OrthodoxDeployer and SmartDeployer without kustomization.yaml"""
+    def test_deploy(self, deployer, data_path):
+        """simple test"""
         env_variables = {
-            "CI_PROJECT_DIR": str(tmp_data_path),
+            "CI_PROJECT_DIR": str(data_path),
             "ENVIRONMENT": "stage",
             "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app",
         }
@@ -48,11 +49,10 @@ class TestOrthodoxSmartDeployer:
             manifest_content, manifests_filename = deployer.deploy(tmp_path, manifests_path)
             assert manifest_content
             assert manifests_filename
-            os.remove(manifests_filename)
 
-    def test_deploy_with_unknown_env(self, deployer, tmp_data_path):
+    def test_deploy_with_unknown_env(self, deployer, data_path):
         env_variables = {
-            "CI_PROJECT_DIR": str(tmp_data_path),
+            "CI_PROJECT_DIR": str(data_path),
             "ENVIRONMENT": "stage",
             "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app-with-env",
         }
@@ -64,12 +64,14 @@ class TestOrthodoxSmartDeployer:
             assert "${SOME_ENV_VAR}" in manifest_content
             assert manifests_filename
 
-    def test_deploy_with_known_env(self, deployer, tmp_path, tmp_data_path):
+    def test_deploy_with_known_env(self, deployer, tmp_path, data_path):
         env_variables = {
-            "CI_PROJECT_DIR": str(tmp_data_path),
+            "CI_PROJECT_DIR": str(data_path),
             "ENVIRONMENT": "stage",
             "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app-with-env",
-            "SOME_ENV_VAR": "known_var"
+            "SOME_ENV_VAR": "known_var",
+            "QUOTED_SOME_ENV_VAR": "123",
+
         }
         with mock_settings(variables=env_variables):
             manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
@@ -77,13 +79,14 @@ class TestOrthodoxSmartDeployer:
             assert manifest_content
             assert "known_var" in manifest_content
             assert "${SOME_ENV_VAR}" not in manifest_content
+            assert "\"123\"" in manifest_content
             assert manifests_filename
 
 
 class TestKustomizeDeployer:
-    def test_deploy_simple(self, tmp_data_path):
+    def test_deploy_simple(self, data_path):
         env_variables = {
-            "CI_PROJECT_DIR": str(tmp_data_path),
+            "CI_PROJECT_DIR": str(data_path),
             "ENVIRONMENT": "stage",
             "MANIFEST_FOLDER": "manifests/apps/kustomize-app/overlays/stage",
         }
@@ -93,11 +96,10 @@ class TestKustomizeDeployer:
             manifest_content, manifests_filename = KustomizeDeployer.deploy(tmp_path, manifests_path)
             assert manifest_content
             assert manifests_filename
-            os.remove(manifests_filename)
 
-    def test_deploy_with_env(self, tmp_data_path):
+    def test_deploy_with_env(self, data_path):
         env_variables = {
-            "CI_PROJECT_DIR": str(tmp_data_path),
+            "CI_PROJECT_DIR": str(data_path),
             "ENVIRONMENT": "stage",
             "MANIFEST_FOLDER": "manifests/apps/kustomize-app-with-env/overlays/stage",
         }
@@ -108,11 +110,13 @@ class TestKustomizeDeployer:
             assert manifest_content
             assert "${SOME_ENV_VAR}" in manifest_content
             assert manifests_filename
-            os.remove(manifests_filename)
 
-    def test_deploy_without_kustomize(self, tmp_data_path):
+    def test_deploy_without_kustomize(self, data_path):
+        """
+        Test deploying by SmartDeployer where:
+        """
         env_variables = {
-            "CI_PROJECT_DIR": str(tmp_data_path),
+            "CI_PROJECT_DIR": str(data_path),
             "ENVIRONMENT": "stage",
             "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app",
         }
@@ -121,3 +125,31 @@ class TestKustomizeDeployer:
             manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
             with pytest.raises(FileExistsError):
                 KustomizeDeployer.deploy(tmp_path, manifests_path)
+
+
+class TestSmartDeployer:
+    def test_deploy_kustomize_with_env(self, data_path):
+        """
+        Test deploying by SmartDeployer where:
+        - kustomization.yaml in manifest folder
+        - container has env with placeholder, which will be replaced by string of digits.
+        Tested two cases: quoted and double-quoted placeholder
+        """
+        env_variables = {
+            "CI_PROJECT_DIR": str(data_path),
+            "ENVIRONMENT": "stage",
+            "MANIFEST_FOLDER": "manifests/apps/kustomize-app-with-env/overlays/stage",
+            "SOME_ENV_VAR": "known_var",
+            "QUOTED_SOME_ENV_VAR": "123",
+            "DOUBLE_QUOTED_SOME_ENV_VAR": "456",
+        }
+        tmp_path = Path(tempfile.mkdtemp())
+        with mock_settings(variables=env_variables):
+            manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
+            manifest_content, manifests_filename = SmartDeployer.deploy(tmp_path, manifests_path)
+            assert manifest_content
+            assert "known_var" in manifest_content
+            assert "\"123\"" not in manifest_content
+            assert "123" in manifest_content
+            assert "\"456\"" in manifest_content
+            assert manifests_filename

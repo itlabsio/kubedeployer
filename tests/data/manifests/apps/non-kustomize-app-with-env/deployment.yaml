@@ -7,11 +7,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: non-kustomize-app
+      app: non-kustomize-app-with-env
   template:
     metadata:
       labels:
-        app: non-kustomize-app
+        app: non-kustomize-app-with-env
     spec:
       containers:
         - name: nginx
@@ -33,3 +33,5 @@ spec:
                   key: NGINX_PORT
             - name: SOME_ENV_VAR
               value: ${SOME_ENV_VAR}
+            - name: QUOTED_SOME_ENV_VAR
+              value: "${QUOTED_SOME_ENV_VAR}"

@@ -33,30 +33,48 @@ connection settings to Kubernetes (ex.: template/to/cluster/*/secret).
 
 Kubedeployer supports three structure maintenance types of manifests to deploy:
 - orthodox
-- smart
+- smart - this one is default
 - kustomize
 
-### Orthodox
+Each deployer is responding for collecting and processing manifest files
 
-Process manifest files in `MANIFEST_FOLDER`. In file placeholder like `${VAR_NAME}` will be replaced by corresponding 
-environment variables `VAR_NAME`. If environment variable `ENVIRONMENT` was defined, kubedeployer will also add files 
-from subdirectory with samename as value of this variable.
-All files concatinates in one and it deployes by applying it to kubernetes cluster.
+### Orthodox
+#### Collecting files
+- Find yaml-files in `MANIFEST_FOLDER`;
+- Append files from subdirectory with name `ENVIRONMENT`.
+#### Processing files
+- Replace placeholder like `${VAR_NAME}` by corresponding environment variables `VAR_NAME` in found files 
+from previous step;
+- Concatenate all files in one.
 
 ### Smart
+Smart deployer has different behavior depending on presence of the `kustomization.yaml` file 
+in `MANIFEST_FOLDER` xor `MANIFEST_FOLDER`/`ENVIRONMENT`:
+- it has not been found
+- it has been found
 
-It is like orthodox deployer, it replaces placeholders with environment variables. But has another algorithm of 
-collecting files and deploying them.
+#### Kustomization.yaml has NOT been found
+##### Collecting files
+- Work like orthodox deployer 
+##### Processing files
+- Create `kustomization.yaml` with all collected yaml-files;
+- Replace placeholder like orthodox deployer
+- Create resulting manifest by `kustomize build`
 
-If in `MANIFEST_FOLDER` were found `kustomization.yaml` file then deployer will collect files by kustomize.
-Else it will create `kustomization.yaml` file with list of files, which were generated like in orthodox deployer.
-Deploy happens by applying `kustomization.yaml`
+#### Kustomization.yaml has been found
+##### Collecting files
+- It does not collect files because they all are listed in `kustomization.yaml`
+##### Processing files
+- Create resulting manifest by `kustomize build`
+- Replace placeholder like orthodox deployer in resulting manifest
 
+> If you want to have quoted values after replacing placeholders like `"123"` not `123`, you should to make double quotes around the placeholder
+> like `'"${PLACEHOLDER}"'` because of specific of working kustomize
 ### Kustomize
 If in `MANIFEST_FOLDER` were found `kustomization.yaml` file then deployer will collect files by kustomize.
 Deploy happens by applying `kustomization.yaml`
 
-Unlike previous deployers this one does not replace placeholders and do not try to guess what can be deployed.
+> Unlike previous deployers this one does not replace placeholders and do not try to guess what can be deployed.
 
 
 ## How to launch in gitlab-ci.yml
