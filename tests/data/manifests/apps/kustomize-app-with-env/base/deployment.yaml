@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kustomize-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kustomize-app-with-env
+  template:
+    metadata:
+      labels:
+        app: kustomize-app-with-env
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.15
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: NGINX_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: kustomize-app
+                  key: NGINX_HOST
+            - name: NGINX_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: kustomize-app
+                  key: NGINX_PORT
+            - name: SOME_ENV_VAR
+              value: ${SOME_ENV_VAR}
+            - name: QUOTED_SOME_ENV_VAR
+              value: "${QUOTED_SOME_ENV_VAR}"
+            - name: DOUBLE_QUOTED_SOME_ENV_VAR
+              value: '"${DOUBLE_QUOTED_SOME_ENV_VAR}"'

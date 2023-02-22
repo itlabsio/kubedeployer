@@ -45,7 +45,7 @@ def apply_manifests(*paths: PathLike, dry_run: bool = False) -> str:
     """
     Apply manifests
 
-    Option `dry_run` allow printing objects that would by sent,
+    Option `dry_run` allow printing objects that would be sent,
     without sending it.
 
     Example:

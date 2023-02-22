@@ -29,6 +29,54 @@ authenticate with Vault-defined roles.
 * ***VAULT_SECRETS_PREFIX*** - template of vault-path to secret where store
 connection settings to Kubernetes (ex.: template/to/cluster/*/secret).
 
+## Supported structure maintenance types
+
+Kubedeployer supports three structure maintenance types of manifests to deploy:
+- orthodox
+- smart - this one is default
+- kustomize
+
+Each deployer is responding for collecting and processing manifest files
+
+### Orthodox
+#### Collecting files
+- Find yaml-files in `MANIFEST_FOLDER`;
+- Append files from subdirectory with name `ENVIRONMENT`.
+#### Processing files
+- Replace placeholder like `${VAR_NAME}` by corresponding environment variables `VAR_NAME` in found files 
+from previous step;
+- Concatenate all files in one.
+
+### Smart
+Smart deployer has different behavior depending on presence of the `kustomization.yaml` file 
+in `MANIFEST_FOLDER` xor `MANIFEST_FOLDER`/`ENVIRONMENT`:
+- it has not been found
+- it has been found
+
+#### Kustomization.yaml has NOT been found
+##### Collecting files
+- Work like orthodox deployer 
+##### Processing files
+- Create `kustomization.yaml` with all collected yaml-files;
+- Replace placeholder like orthodox deployer
+- Create resulting manifest by `kustomize build`
+
+#### Kustomization.yaml has been found
+##### Collecting files
+- It does not collect files because they all are listed in `kustomization.yaml`
+##### Processing files
+- Create resulting manifest by `kustomize build`
+- Replace placeholder like orthodox deployer in resulting manifest
+
+> If you want to have quoted values after replacing placeholders like `"123"` not `123`, you should to make double quotes around the placeholder
+> like `'"${PLACEHOLDER}"'` because of specific of working kustomize
+### Kustomize
+If in `MANIFEST_FOLDER` were found `kustomization.yaml` file then deployer will collect files by kustomize.
+Deploy happens by applying `kustomization.yaml`
+
+> Unlike previous deployers this one does not replace placeholders and do not try to guess what can be deployed.
+
+
 ## How to launch in gitlab-ci.yml
 
 ```yaml
@@ -45,6 +93,14 @@ deploy:
     MANIFEST_FOLDER: ./manifests
   script:
     - kubedeploy
+```
+
+script has options to choose deployer type (orthodox, smart and kustomize). Default value is orthodox.
+Example:
+```yaml
+deploy:
+  script:
+    - kubedeploy -d smart
 ```
 
 ### Environments

@@ -1,8 +1,8 @@
 from datetime import datetime
 from enum import Enum
+from functools import partial
 from typing import Callable, Optional
 from textwrap import indent as indent_wrapper
-
 
 TAB = " " * 4
 
@@ -15,7 +15,6 @@ class Color(Enum):
 
 
 class Wrapper:
-
     ts_fmt = "%d.%m.%Y %H:%M:%S"
 
     def __init__(self,
@@ -46,3 +45,8 @@ def indent(text: str, prefix: str = "") -> str:
 
 def timestamp(text: str, ts: Callable[..., datetime] = datetime.now) -> str:
     return Wrapper(ts=ts).wrap(text)
+
+
+success = partial(colorize, color=Color.GREEN)
+warning = partial(colorize, color=Color.YELLOW)
+error = partial(colorize, color=Color.RED)
