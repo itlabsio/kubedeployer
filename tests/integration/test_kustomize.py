@@ -58,6 +58,7 @@ def test_add_annotations_into_kustomization_file(tmp_path):
     annotations = {
         "commit-ref": "a228d15c7",
         "commit-branch": "development",
+        "digit-annotation": "123",
 
         "empty-annotation": None,
         "empty-string-annotation": "",
@@ -66,11 +67,11 @@ def test_add_annotations_into_kustomization_file(tmp_path):
 
     with open(kustomization, "r") as f:
         content = f.read()
-
         assert "commonAnnotations:" in content
 
         assert "commit-ref: a228d15c7" in content
         assert "commit-branch: development" in content
+        assert "digit-annotation: \"123\"" in content
 
         assert "empty-annotation: \"\"" in content
         assert "empty-string-annotation: \"\"" in content

@@ -15,6 +15,7 @@ def environments():
 
         "VARIABLE": "test",
         "IGNORED_VARIABLE": "ignore",
+        "DIGIT_VARIABLE": "123"
     }
     with mock.patch.dict(os.environ, variables, clear=True):
         yield
@@ -43,6 +44,26 @@ def test_envsubst_replace_variables_in_multiline():
     expected = """
     Line 1: test
     Line 2: test
+    """
+    assert envsubst(text) == expected
+
+
+def test_envsubst_replace_variables_in_multiline_with_quotes():
+    text = """
+    Line 1: "$VARIABLE"
+    Line 2: "${VARIABLE}"
+    Line 3: $VARIABLE
+    Line 4: ${VARIABLE}
+    Line 5: "${DIGIT_VARIABLE}"
+    Line 6: ${DIGIT_VARIABLE}
+    """
+    expected = """
+    Line 1: "test"
+    Line 2: "test"
+    Line 3: test
+    Line 4: test
+    Line 5: "123"
+    Line 6: 123
     """
     assert envsubst(text) == expected
 
