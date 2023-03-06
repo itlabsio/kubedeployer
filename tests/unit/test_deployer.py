@@ -34,9 +34,15 @@ def test_concat_files(file_list):
         assert isinstance(element, dict) if element else element is None
 
 
+def get_manifests_path(env_variables: dict) -> Path:
+    ci_project_dir_path = Path(env_variables[specification.CI_PROJECT_DIR_ENV_VAR])
+    return ci_project_dir_path / env_variables[specification.MANIFEST_FOLDER_ENV_VAR]
+
+
 @pytest.mark.parametrize("deployer", [OrthodoxDeployer, SmartDeployer])
 class TestOrthodoxSmartDeployer:
     """Tests for OrthodoxDeployer and SmartDeployer without kustomization.yaml"""
+
     def test_deploy(self, deployer, data_path):
         """simple test"""
         env_variables = {
@@ -46,7 +52,7 @@ class TestOrthodoxSmartDeployer:
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
-            manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
+            manifests_path = get_manifests_path(env_variables)
             manifest_content, manifests_filename = deployer.deploy(tmp_path, manifests_path)
             assert manifest_content
             assert manifests_filename
@@ -59,7 +65,7 @@ class TestOrthodoxSmartDeployer:
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
-            manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
+            manifests_path = get_manifests_path(env_variables)
             manifest_content, manifests_filename = deployer.deploy(tmp_path, manifests_path)
             assert manifest_content
             assert "${SOME_ENV_VAR}" in manifest_content
@@ -75,7 +81,7 @@ class TestOrthodoxSmartDeployer:
 
         }
         with mock_settings(variables=env_variables):
-            manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
+            manifests_path = get_manifests_path(env_variables)
             manifest_content, manifests_filename = deployer.deploy(tmp_path, manifests_path)
             assert manifest_content
             assert "known_var" in manifest_content
@@ -93,7 +99,7 @@ class TestKustomizeDeployer:
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
-            manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
+            manifests_path = get_manifests_path(env_variables)
             manifest_content, manifests_filename = KustomizeDeployer.deploy(tmp_path, manifests_path)
             assert manifest_content
             assert manifests_filename
@@ -106,7 +112,7 @@ class TestKustomizeDeployer:
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
-            manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
+            manifests_path = get_manifests_path(env_variables)
             manifest_content, manifests_filename = KustomizeDeployer.deploy(tmp_path, manifests_path)
             assert manifest_content
             assert "${SOME_ENV_VAR}" in manifest_content
@@ -123,7 +129,7 @@ class TestKustomizeDeployer:
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
-            manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
+            manifests_path = get_manifests_path(env_variables)
             with pytest.raises(FileExistsError):
                 KustomizeDeployer.deploy(tmp_path, manifests_path)
 
@@ -146,7 +152,7 @@ class TestSmartDeployer:
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
-            manifests_path = Path(env_variables["CI_PROJECT_DIR"]) / env_variables["MANIFEST_FOLDER"]
+            manifests_path = get_manifests_path(env_variables)
             manifest_content, manifests_filename = SmartDeployer.deploy(tmp_path, manifests_path)
             assert manifest_content
             assert "known_var" in manifest_content
