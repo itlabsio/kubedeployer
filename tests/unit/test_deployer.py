@@ -7,6 +7,7 @@ import yaml
 from kubedeployer.deployer.kustomize_deployer import KustomizeDeployer
 from kubedeployer.deployer.orthodox_deployer import concat_files, OrthodoxDeployer
 from kubedeployer.deployer.smart_deployer import SmartDeployer
+from kubedeployer.gitlab_ci import specification
 from tests.mocks import mock_settings
 
 
@@ -39,9 +40,9 @@ class TestOrthodoxSmartDeployer:
     def test_deploy(self, deployer, data_path):
         """simple test"""
         env_variables = {
-            "CI_PROJECT_DIR": str(data_path),
-            "ENVIRONMENT": "stage",
-            "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+            specification.ENVIRONMENT_ENV_VAR: "stage",
+            specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app",
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
@@ -52,9 +53,9 @@ class TestOrthodoxSmartDeployer:
 
     def test_deploy_with_unknown_env(self, deployer, data_path):
         env_variables = {
-            "CI_PROJECT_DIR": str(data_path),
-            "ENVIRONMENT": "stage",
-            "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app-with-env",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+            specification.ENVIRONMENT_ENV_VAR: "stage",
+            specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app-with-env",
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
@@ -66,9 +67,9 @@ class TestOrthodoxSmartDeployer:
 
     def test_deploy_with_known_env(self, deployer, tmp_path, data_path):
         env_variables = {
-            "CI_PROJECT_DIR": str(data_path),
-            "ENVIRONMENT": "stage",
-            "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app-with-env",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+            specification.ENVIRONMENT_ENV_VAR: "stage",
+            specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app-with-env",
             "SOME_ENV_VAR": "known_var",
             "QUOTED_SOME_ENV_VAR": "123",
 
@@ -86,9 +87,9 @@ class TestOrthodoxSmartDeployer:
 class TestKustomizeDeployer:
     def test_deploy_simple(self, data_path):
         env_variables = {
-            "CI_PROJECT_DIR": str(data_path),
-            "ENVIRONMENT": "stage",
-            "MANIFEST_FOLDER": "manifests/apps/kustomize-app/overlays/stage",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+            specification.ENVIRONMENT_ENV_VAR: "stage",
+            specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/kustomize-app/overlays/stage",
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
@@ -99,9 +100,9 @@ class TestKustomizeDeployer:
 
     def test_deploy_with_env(self, data_path):
         env_variables = {
-            "CI_PROJECT_DIR": str(data_path),
-            "ENVIRONMENT": "stage",
-            "MANIFEST_FOLDER": "manifests/apps/kustomize-app-with-env/overlays/stage",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+            specification.ENVIRONMENT_ENV_VAR: "stage",
+            specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/kustomize-app-with-env/overlays/stage",
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
@@ -116,9 +117,9 @@ class TestKustomizeDeployer:
         Test deploying by SmartDeployer where:
         """
         env_variables = {
-            "CI_PROJECT_DIR": str(data_path),
-            "ENVIRONMENT": "stage",
-            "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+            specification.ENVIRONMENT_ENV_VAR: "stage",
+            specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app",
         }
         tmp_path = Path(tempfile.mkdtemp())
         with mock_settings(variables=env_variables):
@@ -136,9 +137,9 @@ class TestSmartDeployer:
         Tested two cases: quoted and double-quoted placeholder
         """
         env_variables = {
-            "CI_PROJECT_DIR": str(data_path),
-            "ENVIRONMENT": "stage",
-            "MANIFEST_FOLDER": "manifests/apps/kustomize-app-with-env/overlays/stage",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+            specification.ENVIRONMENT_ENV_VAR: "stage",
+            specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/kustomize-app-with-env/overlays/stage",
             "SOME_ENV_VAR": "known_var",
             "QUOTED_SOME_ENV_VAR": "123",
             "DOUBLE_QUOTED_SOME_ENV_VAR": "456",
