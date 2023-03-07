@@ -7,6 +7,8 @@ import tempfile
 from pathlib import Path
 from typing import Type
 
+from hvac.exceptions import InvalidPath as VaultInvalidPath
+
 from kubedeployer import console, kubectl
 from kubedeployer.deployer.abstract_deployer import AbstractDeployer
 from kubedeployer.docker import is_docker_login
@@ -27,8 +29,12 @@ def read_kube_token(kube_url):
 
     kube_tokens = {}
     for s in secrets:
-        data = vault_service.read_secret(s)
-        kube_tokens[data["url"]] = data["token"]
+        try:
+            data = vault_service.read_secret(s)
+        except VaultInvalidPath:
+            pass
+        else:
+            kube_tokens[data["url"]] = data["token"]
     return kube_tokens[kube_url]
 
 
@@ -36,14 +42,16 @@ def config_kubectl():
     kube_url = settings.kube_url.value
     kube_namespace = settings.kube_namespace.value
 
+    kube_token = settings.kube_token.value
+    print("KUBE_TOKEN from ENV: ", kube_token)
     try:
         kube_token = read_kube_token(kube_url)
+        print("KUBE_TOKEN from VAULT: ", kube_token)
     except Exception as e:
         console.warning(
             f"Problem with reading kube_token from vault. "
             f"Read it from env. Detail:{str(e)}"
         )
-        kube_token = settings.kube_token.value
 
     if not kube_token:
         raise ValueError("Token for Kubernetes is not set.")

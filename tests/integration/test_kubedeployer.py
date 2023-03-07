@@ -3,9 +3,11 @@ import subprocess
 import pytest
 
 from kubedeployer import deploy
+from kubedeployer.deploy import read_kube_token
 from kubedeployer.deployer.orthodox_deployer import OrthodoxDeployer
 from kubedeployer.deployer.smart_deployer import SmartDeployer
 from kubedeployer.gitlab_ci import specification
+from tests.integration.vault.mocks import HVACClientFactoryMocker
 from tests.mocks import mock_settings
 
 
@@ -194,3 +196,22 @@ def test_kube_smart_apply_manifests_using_kustomization(capsys, kube_config, dat
         assert "Building manifests.." in str(result)
         assert "Apply manifests.." in str(result)
         assert "Waiting for applying changes.." in str(result)
+
+
+def test_read_kube_token_when_one_of_secrets_does_not_exist(mocker, hvac_client):
+    variables = {
+        specification.VAULT_SECRETS_PREFIX_ENV_VAR: "some-secrets/*/default"
+    }
+    mount_point = "secret"
+    secrets = {
+        "some-secrets/cluster1/default": {"url": "1", "token": "t1"},
+        "some-secrets/cluster2/default": {"url": "2", "token": "t2"},
+        "some-secrets/cluster3/enother": {"url": "3", "token": "t3"},
+    }
+    for path in secrets:
+        hvac_client.secrets.kv.v2.create_or_update_secret(path=path, secret=secrets[path], mount_point=mount_point)
+    HVACClientFactoryMocker.mock_create_hvac_client(mocker, hvac_client, mount_point)
+    with mock_settings(variables):
+        token = read_kube_token("2")
+        assert token
+        assert token == "t2"
