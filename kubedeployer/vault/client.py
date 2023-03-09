@@ -5,7 +5,7 @@ import hvac
 
 
 class VaultClient(abc.ABC):
-
+    """abstract class for working with vault"""
     def read_secret(self, path: str) -> Dict[str, Any]:
         raise NotImplementedError
 
@@ -14,7 +14,7 @@ class VaultClient(abc.ABC):
 
 
 class HvacClient(VaultClient):
-
+    """implementation of VaultClient which work via hvac"""
     def __init__(self, hvac_client: hvac.Client, mount_point: str):
         self._client = hvac_client
         self._mount_point = mount_point
