@@ -5,7 +5,6 @@ from kubedeployer.vault.client import VaultClient
 
 
 class VaultService:
-
     DELIMITER = "/"
     WILDCARD = "*"
 

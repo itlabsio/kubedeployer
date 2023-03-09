@@ -1,4 +1,5 @@
 import argparse
+from typing import Type
 
 from kubedeployer import deploy
 from kubedeployer.deployer.abstract_deployer import AbstractDeployer
@@ -21,5 +22,5 @@ if __name__ == "__main__":
         'kustomize': KustomizeDeployer,
         'smart': SmartDeployer
     }
-    deployer: AbstractDeployer = deployer_classes[deployer_type]
+    deployer: Type[AbstractDeployer] = deployer_classes[deployer_type]
     deploy.run(deployer=deployer)

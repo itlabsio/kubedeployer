@@ -3,16 +3,19 @@ import subprocess
 import pytest
 
 from kubedeployer import deploy
+from kubedeployer.deploy import read_kube_token
 from kubedeployer.deployer.orthodox_deployer import OrthodoxDeployer
 from kubedeployer.deployer.smart_deployer import SmartDeployer
+from kubedeployer.gitlab_ci import specification
+from tests.integration.vault.mocks import HvacClientFactoryMocker
 from tests.mocks import mock_settings
 
 
 def test_smart_apply_only_manifests(capsys, kube_config, data_path):
     variables = {
-        "CI_PROJECT_DIR": str(data_path),
-        "ENVIRONMENT": "stage",
-        "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app",
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.ENVIRONMENT_ENV_VAR: "stage",
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app",
     }
 
     with mock_settings(variables):
@@ -35,9 +38,9 @@ def test_smart_apply_only_manifests(capsys, kube_config, data_path):
 
 def test_smart_apply_only_manifests_with_envs(capsys, kube_config, data_path):
     variables = {
-        "CI_PROJECT_DIR": str(data_path),
-        "ENVIRONMENT": "stage",
-        "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app-with-env",
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.ENVIRONMENT_ENV_VAR: "stage",
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app-with-env",
     }
 
     with mock_settings(variables):
@@ -60,8 +63,8 @@ def test_smart_apply_only_manifests_with_envs(capsys, kube_config, data_path):
 
 def test_smart_apply_manifests_using_kustomization(capsys, kube_config, data_path):
     variables = {
-        "CI_PROJECT_DIR": str(data_path),
-        "MANIFEST_FOLDER": "manifests/apps/kustomize-app/overlays/stage",
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/kustomize-app/overlays/stage",
     }
 
     with mock_settings(variables):
@@ -84,8 +87,8 @@ def test_smart_apply_manifests_using_kustomization(capsys, kube_config, data_pat
 def test_raises_on_applying_if_manifest_folder_not_exist(tmp_path, kube_config):
     with pytest.raises(FileExistsError, match="folder .* doesn't exist"):
         variables = {
-            "CI_PROJECT_DIR": str(tmp_path),
-            "MANIFEST_FOLDER": "non-existent-path",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(tmp_path),
+            specification.MANIFEST_FOLDER_ENV_VAR: "non-existent-path",
         }
 
         with mock_settings(variables):
@@ -97,8 +100,8 @@ def test_raises_on_applying_if_manifests_files_not_found(tmp_path, kube_config):
         (tmp_path / "empty-project").mkdir()
 
         variables = {
-            "CI_PROJECT_DIR": str(tmp_path),
-            "MANIFEST_FOLDER": "empty-project",
+            specification.CI_PROJECT_DIR_ENV_VAR: str(tmp_path),
+            specification.MANIFEST_FOLDER_ENV_VAR: "empty-project",
         }
         with mock_settings(variables) as d:
             deploy.run(deployer=SmartDeployer)
@@ -106,9 +109,9 @@ def test_raises_on_applying_if_manifests_files_not_found(tmp_path, kube_config):
 
 def test_orthodox_apply_only_manifests(capsys, kube_config, data_path):
     variables = {
-        "CI_PROJECT_DIR": str(data_path),
-        "ENVIRONMENT": "stage",
-        "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app",
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.ENVIRONMENT_ENV_VAR: "stage",
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app",
     }
 
     with mock_settings(variables):
@@ -130,9 +133,9 @@ def test_orthodox_apply_only_manifests(capsys, kube_config, data_path):
 
 def test_orthodox_apply_only_manifests_with_envs(capsys, kube_config, data_path):
     variables = {
-        "CI_PROJECT_DIR": str(data_path),
-        "ENVIRONMENT": "stage",
-        "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app-with-env",
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.ENVIRONMENT_ENV_VAR: "stage",
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app-with-env",
     }
 
     with mock_settings(variables):
@@ -161,9 +164,9 @@ def test_commandline_help(capsys):
 
 def test_kube_orthodox_apply_only_manifests_with_envs(capsys, kube_config, data_path):
     variables = {
-        "CI_PROJECT_DIR": str(data_path),
-        "ENVIRONMENT": "stage",
-        "MANIFEST_FOLDER": "manifests/apps/non-kustomize-app-with-env",
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.ENVIRONMENT_ENV_VAR: "stage",
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app-with-env",
     }
 
     with mock_settings(variables):
@@ -179,8 +182,8 @@ def test_kube_orthodox_apply_only_manifests_with_envs(capsys, kube_config, data_
 
 def test_kube_smart_apply_manifests_using_kustomization(capsys, kube_config, data_path):
     variables = {
-        "CI_PROJECT_DIR": str(data_path),
-        "MANIFEST_FOLDER": "manifests/apps/kustomize-app/overlays/stage",
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/kustomize-app/overlays/stage",
     }
 
     with mock_settings(variables):
@@ -193,3 +196,22 @@ def test_kube_smart_apply_manifests_using_kustomization(capsys, kube_config, dat
         assert "Building manifests.." in str(result)
         assert "Apply manifests.." in str(result)
         assert "Waiting for applying changes.." in str(result)
+
+
+def test_read_kube_token_when_one_of_secrets_does_not_exist(mocker, hvac_client):
+    variables = {
+        specification.VAULT_SECRETS_PREFIX_ENV_VAR: "some-secrets/*/default"
+    }
+    mount_point = "secret"
+    secrets = {
+        "some-secrets/cluster1/default": {"url": "1", "token": "t1"},
+        "some-secrets/cluster2/default": {"url": "2", "token": "t2"},
+        "some-secrets/cluster3/another": {"url": "3", "token": "t3"},
+    }
+    for path in secrets:
+        hvac_client.secrets.kv.v2.create_or_update_secret(path=path, secret=secrets[path], mount_point=mount_point)
+    HvacClientFactoryMocker.mock_create_hvac_client(mocker, hvac_client, mount_point)
+    with mock_settings(variables):
+        token = read_kube_token("2")
+        assert token
+        assert token == "t2"

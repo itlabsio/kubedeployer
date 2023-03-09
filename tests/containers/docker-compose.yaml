@@ -5,6 +5,8 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
+    depends_on:
+      - vault
     networks:
       - kind
     extra_hosts:
@@ -14,6 +16,25 @@ services:
       KUBE_URL: $KUBE_URL
       KUBE_TOKEN: $KUBE_TOKEN
       KUBE_NAMESPACE: default
+      VAULT_URL: http://vault:8200
+      VAULT_DEV_ROOT_TOKEN_ID: myroot
+
+  vault:
+    image: vault:1.10.0
+    container_name: vault
+    networks:
+      - kind
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: http://0.0.0.0:8200
+      VAULT_API_ADDR: http://0.0.0.0:8200
+      VAULT_ADDRESS: http://0.0.0.0:8200
+      VAULT_DEV_ROOT_TOKEN_ID: myroot
+    cap_add:
+      - IPC_LOCK
 
 networks:
   kind:
