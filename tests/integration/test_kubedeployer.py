@@ -206,7 +206,7 @@ def test_read_kube_token_when_one_of_secrets_does_not_exist(mocker, hvac_client)
     secrets = {
         "some-secrets/cluster1/default": {"url": "1", "token": "t1"},
         "some-secrets/cluster2/default": {"url": "2", "token": "t2"},
-        "some-secrets/cluster3/enother": {"url": "3", "token": "t3"},
+        "some-secrets/cluster3/another": {"url": "3", "token": "t3"},
     }
     for path in secrets:
         hvac_client.secrets.kv.v2.create_or_update_secret(path=path, secret=secrets[path], mount_point=mount_point)
