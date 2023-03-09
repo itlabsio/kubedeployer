@@ -43,10 +43,8 @@ def config_kubectl():
     kube_namespace = settings.kube_namespace.value
 
     kube_token = settings.kube_token.value
-    print("KUBE_TOKEN from ENV: ", kube_token)
     try:
         kube_token = read_kube_token(kube_url)
-        print("KUBE_TOKEN from VAULT: ", kube_token)
     except Exception as e:
         console.warning(
             f"Problem with reading kube_token from vault. "
