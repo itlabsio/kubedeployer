@@ -13,7 +13,7 @@ class VaultClient(abc.ABC):
         raise NotImplementedError
 
 
-class HVACClient(VaultClient):
+class HvacClient(VaultClient):
 
     def __init__(self, hvac_client: hvac.Client, mount_point: str):
         self._client = hvac_client
