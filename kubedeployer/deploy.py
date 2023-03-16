@@ -13,6 +13,7 @@ from kubedeployer import console, kubectl
 from kubedeployer.deployer.abstract_deployer import AbstractDeployer
 from kubedeployer.docker import is_docker_login
 from kubedeployer.gitlab_ci.environment_variables import settings
+from kubedeployer.kubectl import KubectlError
 from kubedeployer.manifests import get_manifests, ROLLOUT_RESOURCES, get_images
 from kubedeployer.security.kubesec import create_kube_security_report
 from kubedeployer.security.trivy import create_trivy_report
@@ -94,6 +95,14 @@ def print_trivy_report(*images: str):
         console.error(str(e))
 
 
+def print_diff_manifests(manifests_dir: PathLike):
+    try:
+        diffed_manifests = kubectl.diff_manifests(manifests_dir)
+        console.info(diffed_manifests, console.TAB)
+    except KubectlError as e:
+        console.error(str(e))
+
+
 def run(deployer: Type[AbstractDeployer]):
     try:
         console.stage("Let's deploy it!")
@@ -124,8 +133,7 @@ def run(deployer: Type[AbstractDeployer]):
         print_kubesec_report(manifests_filename)
 
         console.stage("Diff manifests..")
-        diffed_manifests = kubectl.diff_manifests(tmp_path)
-        console.info(diffed_manifests, console.TAB)
+        print_diff_manifests(tmp_path)
 
         console.stage("Apply manifests..")
         applied_manifests = kubectl.apply_manifests(manifests_filename)
