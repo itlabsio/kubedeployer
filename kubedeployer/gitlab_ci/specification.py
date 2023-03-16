@@ -30,14 +30,6 @@ CI_JOB_URL_ENV_VAR = 'CI_JOB_URL'
 CI_PIPELINE_ID_ENV_VAR = 'CI_PIPELINE_ID'
 CI_REGISTRY_ENV_VAR = 'CI_REGISTRY'
 
-ANNOTATION_CI_COMMIT_REF = 'ci.itlabs.io/commit-ref'
-ANNOTATION_CI_JOB_REF = 'ci.itlabs.io/job-ref'
-ANNOTATION_CI_JOB_AUTHOR = 'ci.itlabs.io/job-author'
-ANNOTATION_CI_REPO_URL = 'ci.itlabs.io/repo-url'
-ANNOTATION_CI_PROJECT_ID = 'ci.itlabs.io/gl-project-id'
-ANNOTATION_CI_COMMIT_BRANCH = 'ci.itlabs.io/commit-branch'
-ANNOTATION_CI_COMMIT_TAG = 'ci.itlabs.io/commit-tag'
-
 TRIVY_IMAGE_TEMPLATE_ENV_VAR = 'TRIVY_IMAGE_TEMPLATE'
 
 DEPLOY_WAIT_TIMEOUT_ENV_VAR = 'DEPLOY_WAIT_TIMEOUT'

@@ -15,9 +15,7 @@ prepare_infrastructure() {
   # Create infrastructure
   kubectl apply -f tests/containers/manifests/rbac.yaml
   secretname=`kubectl get serviceaccounts deployer -o=jsonpath='{.secrets[0].name}'`
-  echo "SECRETNAME ", secretname
   secret=`kubectl get secret $secretname -o=jsonpath='{.data.token}' | base64 -d`
-  echo "SECRET ", secret
   touch env_vars
   echo KUBE_TOKEN=$secret >> env_vars
   echo KUBE_URL="https://${REAL_IP}:6443" >> env_vars

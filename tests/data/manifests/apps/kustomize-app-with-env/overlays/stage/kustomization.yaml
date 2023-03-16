@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+- configmap.yaml
+commonAnnotations:
+  ci.itlabs.io/commit-branch: ""
+  ci.itlabs.io/commit-ref: fake-commit
+  ci.itlabs.io/commit-tag: ""
+  ci.itlabs.io/gl-project-id: fake-project
+  ci.itlabs.io/job-author: ""
+  ci.itlabs.io/job-ref: ""
+  ci.itlabs.io/repo-url: ""
