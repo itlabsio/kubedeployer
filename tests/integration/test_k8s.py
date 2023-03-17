@@ -4,7 +4,6 @@ import pytest
 
 from kubedeployer import kubectl
 from kubedeployer.manifests import get_manifests, InvalidRolloutResource
-from kubedeployer.gitlab_ci.environment_variables import settings
 
 
 @pytest.fixture
@@ -12,16 +11,6 @@ def manifests(data_path):
     with open(data_path / "manifests/manifests.yaml", "r") as f:
         content = f.read()
         return list(get_manifests(content, kind="Service"))
-
-
-@pytest.fixture(autouse=True, scope="module")
-def kube_context():
-    kubectl.configure(
-        server=settings.kube_url.value,
-        token=settings.kube_token.value,
-        namespace="default",
-        context="default-context",
-    )
 
 
 def test_configure_kubectl(kube_config):
