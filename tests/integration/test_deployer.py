@@ -1,7 +1,7 @@
 from kubedeployer.deploy import print_diff_manifests
 
 
-def test_success_printing_diff_manifests(capsys, data_path):
+def test_success_printing_diff_manifests(capsys, kube_config, data_path):
     print_diff_manifests(data_path / "manifests/manifests.yaml")
 
     captured = capsys.readouterr()
@@ -10,7 +10,7 @@ def test_success_printing_diff_manifests(capsys, data_path):
     assert captured.err == ""
 
 
-def test_failure_printing_diff_manifests(capsys, data_path):
+def test_failure_printing_diff_manifests(capsys, kube_config, data_path):
     print_diff_manifests(data_path / "non-exist-manifest.yaml")
 
     captured = capsys.readouterr()
