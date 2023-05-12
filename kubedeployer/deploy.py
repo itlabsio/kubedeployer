@@ -5,9 +5,10 @@ import random
 import string
 import tempfile
 from pathlib import Path
-from typing import Type
+from typing import Type, List
 
 from hvac.exceptions import InvalidPath as VaultInvalidPath
+from dotenv import load_dotenv
 
 from kubedeployer import console, kubectl
 from kubedeployer.deployer.abstract_deployer import AbstractDeployer
@@ -62,6 +63,14 @@ def config_kubectl():
     )
 
 
+def load_environment_variables(env_files: List[str] | None = None):
+    if not env_files:
+        return
+
+    for file in env_files:
+        load_dotenv(dotenv_path=file, override=True)
+
+
 def print_kubesec_report(filename: PathLike):
     try:
         report = create_kube_security_report()
@@ -103,12 +112,17 @@ def print_diff_manifests(manifests_dir: PathLike):
         console.error(str(e))
 
 
-def run(deployer: Type[AbstractDeployer]):
+def run(
+        deployer: Type[AbstractDeployer],
+        dry_run: bool = False,
+        env_files: List[str] | None = None
+):
     try:
         console.stage("Let's deploy it!")
 
         os.environ['DEPLOY'] = ''.join(random.sample(
             string.digits + string.ascii_letters, 32))
+        load_environment_variables(env_files)
 
         config_kubectl()
 
@@ -121,8 +135,11 @@ def run(deployer: Type[AbstractDeployer]):
         manifests_content, manifests_filename = deployer.deploy(tmp_path, manifests_path)
 
         console.stage("Manifest files ready")
-        if need_show_manifests:
+        if need_show_manifests or dry_run:
             console.info(manifests_content, console.TAB)
+
+        if dry_run:
+            return
 
         console.stage("Scanning images..")
         image_pattern = get_trivy_image_pattern()

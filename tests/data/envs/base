@@ -1,0 +1,2 @@
+SOME_ENV_VAR=some-env-var-value
+QUOTED_SOME_ENV_VAR=quoted-some-env-var-value
