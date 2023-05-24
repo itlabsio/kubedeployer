@@ -215,3 +215,55 @@ def test_read_kube_token_when_one_of_secrets_does_not_exist(mocker, hvac_client)
         token = read_kube_token("2")
         assert token
         assert token == "t2"
+
+
+def test_smart_dry_run_using_external_files_with_envs(capsys, kube_config, data_path):
+    variables = {
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.ENVIRONMENT_ENV_VAR: "stage",
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app-with-env",
+    }
+
+    with mock_settings(variables):
+        result = subprocess.check_output(
+            "kubedeploy "
+            f"--dry-run "
+            f"--env-file {data_path}/envs/base {data_path}/envs/override",
+            stderr=subprocess.STDOUT,
+            shell=True
+        )
+
+        assert "Scanning images.." not in str(result)
+        assert "Scanning manifests.." not in str(result)
+        assert "Apply manifests.." not in str(result)
+        assert "Waiting for applying changes.." not in str(result)
+
+        assert "value: some-env-var-value" in str(result)
+        assert "value: quoted-some-env-var-other-value" in str(result)
+        assert "value: quoted-some-env-var-value" not in str(result)
+
+
+def test_orthodox_dry_run_using_external_files_with_envs(capsys, kube_config, data_path):
+    variables = {
+        specification.CI_PROJECT_DIR_ENV_VAR: str(data_path),
+        specification.ENVIRONMENT_ENV_VAR: "stage",
+        specification.MANIFEST_FOLDER_ENV_VAR: "manifests/apps/non-kustomize-app-with-env",
+    }
+
+    with mock_settings(variables):
+        result = subprocess.check_output(
+            "kubedeploy -d orthodox "
+            f"--dry-run "
+            f"--env-file {data_path}/envs/base {data_path}/envs/override",
+            stderr=subprocess.STDOUT,
+            shell=True
+        )
+
+        assert "Scanning images.." not in str(result)
+        assert "Scanning manifests.." not in str(result)
+        assert "Apply manifests.." not in str(result)
+        assert "Waiting for applying changes.." not in str(result)
+
+        assert "value: some-env-var-value" in str(result)
+        assert 'value: "quoted-some-env-var-other-value"' in str(result)
+        assert 'value: "quoted-some-env-var-value"' not in str(result)
