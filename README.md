@@ -8,7 +8,8 @@ Deploy application on Kubernetes.
 * Deploy application using kustomize.
 * Manifests can contain environment variables.
 * Contain security scanner for Kubernetes resources.
-* Contain security scanner for docker images. 
+* Contain security scanner for docker images.
+* Contain dry-run mode, where only the manifest is built without applying it.
 
 ## How to build
 
@@ -28,6 +29,26 @@ authenticate with Vault-defined roles.
 * ***VAULT_APPROLE_SECRET*** - approle secret. 
 * ***VAULT_SECRETS_PREFIX*** - template of vault-path to secret where store
 connection settings to Kubernetes (ex.: template/to/cluster/*/secret).
+
+## Usage
+
+```shell
+kubedeploy options
+```
+
+Example
+
+```shell
+kubedeploy -d orthodox --dry-run --env-file ./base.txt ./production.txt
+```
+
+### Options
+
+* __-d__, __-deployer__=smart: structure maintenance types
+(see Supported structure maintenance types);
+* __--dry-run__: only show built manifest without apply it;
+* __--env-file__ list: read in a file of environment variables. If environment
+variable does contain in several files, then it will be has value from last file.
 
 ## Supported structure maintenance types
 

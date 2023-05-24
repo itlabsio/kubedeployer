@@ -13,8 +13,22 @@ if __name__ == "__main__":
         "-d", "--deployer",
         choices=['orthodox', 'kustomize', 'smart'],
         default='smart',
-        help="deploy by available choices: orthodox, kustomize or smart, default is orthodox"
+        help="deploy by available choices: orthodox, kustomize or smart, default is orthodox",
     )
+    parser.add_argument(
+        "--dry-run",
+        type=bool,
+        action=argparse.BooleanOptionalAction,
+        help="show only manifests if dry-run is set",
+    )
+    parser.add_argument(
+        "--env-file",
+        type=str,
+        nargs="+",
+        action="extend",
+        help="read in a file of environment variables",
+    )
+
     args = parser.parse_args()
     deployer_type = args.deployer
     deployer_classes = {
@@ -23,4 +37,4 @@ if __name__ == "__main__":
         'smart': SmartDeployer
     }
     deployer: Type[AbstractDeployer] = deployer_classes[deployer_type]
-    deploy.run(deployer=deployer)
+    deploy.run(deployer=deployer, dry_run=args.dry_run, env_files=args.env_file)
