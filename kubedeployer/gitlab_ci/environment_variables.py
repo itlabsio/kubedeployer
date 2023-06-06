@@ -64,7 +64,7 @@ class Settings:
         """
         The branch or tag name for which project is built.
         """
-        return self._variable_reader.read_str(specification.CI_COMMIT_REF_NAME_ENV_VAR, is_required=True)
+        return self._variable_reader.read_str(specification.CI_COMMIT_REF_NAME_ENV_VAR, is_required=False)
 
     @property
     def ci_commit_branch(self) -> StrVariable:

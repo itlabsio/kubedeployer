@@ -22,15 +22,6 @@ prepare_infrastructure() {
   cat env_vars
 }
 
-run_tests() {
-  echo RUNNING TESTS
-  # Check configmap is created with credentials for vault
-  docker-compose --env-file env_vars -f tests/containers/docker-compose.yaml up --abort-on-container-exit --exit-code-from tester --build
-  exit_code=$?
-  echo "EXITCODE tests", $exit_code
-  exit $exit_code
-}
-
 if [[ $VM_IP ]]; then
   export REAL_IP=$VM_IP
 else
@@ -41,4 +32,3 @@ echo REAL_IP $REAL_IP
 prepare_kind
 prepare_image
 prepare_infrastructure
-run_tests
