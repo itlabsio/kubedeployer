@@ -52,9 +52,7 @@ RUN pip install -r requirements.txt
 COPY tests ./tests
 
 FROM base AS release
-# RUN pip install kubedeployer==${LIB_VERSION}
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install kubedeployer==${LIB_VERSION}
 
 FROM release AS e2e
 COPY tests/data/manifests ./manifests
