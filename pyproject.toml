@@ -31,7 +31,7 @@ dynamic = ["version"]
 "Bug Tracker" = "https://github.com/itlabsio/kubedeployer/issues"
 
 [project.scripts]
-kubedeploy = "kubedeployer:main"
+kubedeploy = "kubedeployer:run_kubedeployer"
 
 [tool.hatch.version]
 source = "vcs"
