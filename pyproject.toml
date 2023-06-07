@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kubedeployer"
+description = "package to deploy application on kubernetes"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE"}
+keywords = ["deploy", "kubernetes"]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "kubernetes>=22.6.0",
+    "PyYAML==6.0",
+    "hvac==0.8.2",
+    "ujson==5.4.0",
+    "pydantic==1.10.2",
+    "prettytable==2.5.0",
+    "python-dotenv==1.0.0",
+]
+
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/itlabsio/kubedeployer"
+"Bug Tracker" = "https://github.com/itlabsio/kubedeployer/issues"
+
+[project.scripts]
+kubedeploy = "kubedeployer"
+
+[tool.hatch.version]
+source = "vcs"

@@ -1,0 +1,19 @@
+services:
+  tester:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: tests
+    depends_on:
+      - vault
+    networks:
+      - kind
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: pytest ./tests/integration
+    environment:
+      KUBE_URL: $KUBE_URL
+      KUBE_TOKEN: $KUBE_TOKEN
+      KUBE_NAMESPACE: default
+      VAULT_URL: http://vault:8200
+      VAULT_DEV_ROOT_TOKEN_ID: myroot

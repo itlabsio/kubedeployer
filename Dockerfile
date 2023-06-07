@@ -4,6 +4,7 @@ ARG VAULT_URL
 ARG VAULT_APPROLE_ID
 ARG VAULT_APPROLE_SECRET
 ARG VAULT_SECRETS_PREFIX
+ARG LIB_VERSION
 
 ENV VAULT_APPROLE_ID=$VAULT_APPROLE_ID
 ENV VAULT_APPROLE_SECRET=$VAULT_APPROLE_SECRET
@@ -14,6 +15,7 @@ ENV KUSTOMIZE_VERSION=v4.5.7
 ENV KUBESEC_VERSION=v2.11.5
 ENV TRIVY_VERSION=v0.30.4
 ENV VAULT_URL=$VAULT_URL
+ENV LIB_VERSION=$LIB_VERSION
 
 COPY kubedeploy /usr/local/bin/kubedeploy
 
@@ -37,14 +39,20 @@ RUN chmod +x /usr/local/bin/kubedeploy \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY main.py .
 COPY kubedeployer ./kubedeployer
 
 CMD /usr/local/bin/kubedeploy
 
 
 FROM base AS tests
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
 COPY tests ./tests
+
+FROM base AS release
+RUN pip install kubedeployer==${LIB_VERSION}
+
+FROM release AS e2e
+COPY tests/data/manifests ./manifests
