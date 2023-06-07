@@ -175,8 +175,8 @@ jobs:
         with:
           context: .
           target: release
-          build-args:
-            - LIB_VERSION: ${{ steps.get_version.outputs.version-without-v }}
+          build-args: |
+            LIB_VERSION: ${{ steps.get_version.outputs.version-without-v }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
