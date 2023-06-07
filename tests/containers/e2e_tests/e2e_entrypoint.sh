@@ -28,7 +28,7 @@ prepare_env_vars
 docker-compose --env-file env_vars -f tests/containers/docker-compose.yaml up -d
 
 docker build --build-arg LIB_VERSION=${LIB_VERSION} -t $DOCKER_IMAGE --target e2e -f Dockerfile .
-docker run --env-file env_vars $DOCKER_IMAGE kubedeploy
+docker run --env-file env_vars --add-host host.docker.internal:host-gateway --network=kind $DOCKER_IMAGE kubedeploy
 configmap_output=`kubectl get configmap non-kustomize-app --ignore-not-found`
 pod_output=`kubectl get pods | grep non-kustomize-app-with-env`
 if [[ -z "$configmap_output" ]]; then
