@@ -42,6 +42,12 @@ def run_kubedeployer():
     )
 
     parser.add_argument(
+        "--environment",
+        type=str,
+        help="environment for builder",
+    )
+
+    parser.add_argument(
         "--manifest-folder",
         type=str,
         help="path to folder with manifest, path is relative to current working directory",
@@ -54,6 +60,8 @@ def run_kubedeployer():
         os.environ[specification.MANIFEST_FOLDER_ENV_VAR] = args.manifest_folder
     if args.project_dir:
         os.environ[specification.CI_PROJECT_DIR_ENV_VAR] = args.project_dir
+    if args.environment:
+        os.environ[specification.ENVIRONMENT_ENV_VAR] = args.environment
     if dry_run:
         os.environ[specification.CI_PROJECT_ID_ENV_VAR] = '0'
     deployer_classes = {

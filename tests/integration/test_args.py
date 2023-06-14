@@ -6,12 +6,13 @@ def test_dry_run_with_no_vars_only_with_args(capsys, kube_config, data_path):
         "kubedeploy "
         "--dry-run "
         f"--project-dir {data_path} "
+        f"--environment stage "
         f"--manifest-folder manifests/apps/non-kustomize-app ",
         stderr=subprocess.STDOUT,
         shell=True
     )
 
-    print(result)
+    assert "kind: ConfigMap" in str(result)
     assert "Scanning images.." not in str(result)
     assert "Scanning manifests.." not in str(result)
     assert "Apply manifests.." not in str(result)
