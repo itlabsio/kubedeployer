@@ -15,7 +15,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "kubernetes>=22.6.0",
+    "kubernetes==25.3.0",
     "PyYAML==6.0",
     "hvac==0.8.2",
     "ujson==5.4.0",

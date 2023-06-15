@@ -11,7 +11,20 @@ Deploy application on Kubernetes.
 * Contain security scanner for docker images.
 * Contain dry-run mode, where only the manifest is built without applying it.
 
-## How to build
+## Installation
+- [using pip](#using-pip)
+- [using docker](#using-docker)
+
+### Using pip
+```shell
+pip install kubedeployer
+```
+### Using docker
+```shell
+docker run itlabsio/kubedeployer
+```
+
+#### How to build
 
 ```shell
 docker build \

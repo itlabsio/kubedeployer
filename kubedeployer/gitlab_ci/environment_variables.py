@@ -1,3 +1,5 @@
+import os
+
 from kubedeployer.gitlab_ci import specification
 from kubedeployer.gitlab_ci.variable_reader import AbstractVariableReader, EnvironmentVariableReader
 from kubedeployer.gitlab_ci.variable_types import StrVariable, BoolVariable, \
@@ -50,7 +52,8 @@ class Settings:
         If the GitLab Runner builds_dir parameter is set, this variable is set
         relative to the value of builds_dir.
         """
-        return self._variable_reader.read_str(specification.CI_PROJECT_DIR_ENV_VAR, is_required=True)
+        default_value = os.getcwd()
+        return self._variable_reader.read_str(specification.CI_PROJECT_DIR_ENV_VAR, default_value=default_value)
 
     @property
     def ci_commit_sha(self) -> StrVariable:
