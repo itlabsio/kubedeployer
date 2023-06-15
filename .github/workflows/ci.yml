@@ -109,7 +109,7 @@ jobs:
           body: ${{ steps.build_changelog.outputs.changelog }}
 
   publish-to-test-pypi:
-    name: publish to pypi
+    name: publish to test pypi
     permissions:
       contents: read
     needs: [create-release]
@@ -128,7 +128,7 @@ jobs:
 
   e2e-tests:
     name: run e2e tests
-    needs: [publish-to-pypi]
+    needs: [publish-to-test-pypi]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -151,7 +151,7 @@ jobs:
     name: publish to pypi
     permissions:
       contents: read
-    needs: [lint, unit-tests, integration-tests, publish-to-pypi, e2e-tests]
+    needs: [lint, unit-tests, integration-tests, e2e-tests]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
