@@ -52,7 +52,7 @@ RUN pip install -r requirements.txt
 COPY tests ./tests
 
 FROM base AS release-to-test
-RUN pip install  -i https://test.pypi.org/simple/ kubedeployer==${LIB_VERSION}
+RUN pip install --extra-index-url https://test.pypi.org/simple/ kubedeployer==${LIB_VERSION}
 
 FROM release-to-test AS e2e
 COPY tests/data/manifests ./manifests
