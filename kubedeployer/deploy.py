@@ -124,8 +124,6 @@ def run(
             string.digits + string.ascii_letters, 32))
         load_environment_variables(env_files)
 
-        config_kubectl()
-
         tmp_path = Path(tempfile.mkdtemp())
         need_show_manifests = settings.show_manifests.value
 
@@ -153,6 +151,7 @@ def run(
         print_diff_manifests(tmp_path)
 
         console.stage("Apply manifests..")
+        config_kubectl()
         applied_manifests = kubectl.apply_manifests(manifests_filename)
         console.info(applied_manifests, console.TAB)
 
