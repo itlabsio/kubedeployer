@@ -4,6 +4,8 @@ services:
       context: ../..
       dockerfile: Dockerfile
       target: tests
+      args:
+        LIB_VERSION: ${LIB_VERSION}
     depends_on:
       - vault
     networks:
