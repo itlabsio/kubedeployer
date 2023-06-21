@@ -62,6 +62,12 @@ kubedeploy -d orthodox --dry-run --env-file ./base.txt ./production.txt
 * __--dry-run__: only show built manifest without apply it;
 * __--env-file__ list: read in a file of environment variables. If environment
 variable does contain in several files, then it will be has value from last file.
+* __--project-dir \<path\>__: full path to folder with project, if it is not setted,
+used value from environment variable `CI_PROJECT_DIR`, if variable is not setted, as 
+default value used current working directory
+* __--environment \<env_name\>__: environment for builder, if it is not setted, used
+value from environment variable `ENVIRONMENT`
+* __--manifest-folder \<path\>__: path to folder with manifest, path is relative to project_dir. If it is not set, will get value from environment variable `MANIFEST_FOLDER`
 
 ## Supported structure maintenance types
 
