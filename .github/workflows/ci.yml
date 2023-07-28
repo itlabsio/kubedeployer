@@ -62,7 +62,7 @@ jobs:
     name: Create release
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag'
-    needs: [lint, unit-tests, integration-tests]
+    needs: [ lint, unit-tests, integration-tests ]
     steps:
       - name: Build changelog
         id: build_changelog
@@ -112,7 +112,7 @@ jobs:
     name: publish to test pypi
     permissions:
       contents: read
-    needs: [create-release]
+    needs: [ create-release ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -128,7 +128,7 @@ jobs:
 
   e2e-tests:
     name: run e2e tests
-    needs: [publish-to-test-pypi]
+    needs: [ publish-to-test-pypi ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -151,7 +151,7 @@ jobs:
     name: publish to pypi
     permissions:
       contents: read
-    needs: [lint, unit-tests, integration-tests, e2e-tests]
+    needs: [ lint, unit-tests, integration-tests, e2e-tests ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -168,7 +168,7 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag'
-    needs: [lint, unit-tests, integration-tests, publish-to-pypi, e2e-tests]
+    needs: [ lint, unit-tests, integration-tests, publish-to-pypi, e2e-tests ]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -199,7 +199,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  trigger-pipeline:
+  trigger-pipeline-by-main:
     name: Trigger Gitlab pipeline
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -210,4 +210,21 @@ jobs:
           URL: ${{ secrets.GITLAB_URL }}
           TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          curl -X POST --fail -F token=${TOKEN} -F ref=github ${URL}
+          curl --request POST --header "PRIVATE-TOKEN: ${TOKEN}" --header "Content-Type: application/json" --data '{"ref": "master", "variables": [{"key": "FROM_GITHUB", "value": "YES"}]}' ${URL}
+
+  trigger-pipeline-by-tag:
+    name: Trigger Gitlab pipeline
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    needs: [ lint, unit-tests, integration-tests ]
+    steps:
+      - id: get_version
+        uses: battila7/get-version-action@v2
+      - name: Run pipeline
+        env:
+          URL: ${{ secrets.GITLAB_URL }}
+          TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          LIB_VERSION: ${{ steps.get_version.outputs.version-without-v }}
+        run: |
+          curl --request POST --header "PRIVATE-TOKEN: ${TOKEN}" --header "Content-Type: application/json" --data '{"ref": "master", "variables": [{"key": "LIB_VERSION", "value": "'$LIB_VERSION'"}]}' ${URL}
+
