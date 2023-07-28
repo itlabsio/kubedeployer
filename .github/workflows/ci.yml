@@ -200,7 +200,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   trigger-pipeline-by-main:
-    name: Trigger Gitlab pipeline
+    name: Trigger Gitlab pipeline by main
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     needs: [lint, unit-tests, integration-tests]
@@ -213,7 +213,7 @@ jobs:
           curl --request POST --header "PRIVATE-TOKEN: ${TOKEN}" --header "Content-Type: application/json" --data '{"ref": "master", "variables": [{"key": "FROM_GITHUB", "value": "YES"}]}' ${URL}
 
   trigger-pipeline-by-tag:
-    name: Trigger Gitlab pipeline
+    name: Trigger Gitlab pipeline by tag
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag'
     needs: [ lint, unit-tests, integration-tests ]
