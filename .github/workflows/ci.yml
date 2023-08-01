@@ -210,7 +210,7 @@ jobs:
           URL: ${{ secrets.GITLAB_URL }}
           TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          curl -X POST --fail -F token=${TOKEN} -F ref=github ${URL}
+          curl -X POST --fail -F token=${TOKEN} -F ref=master ${URL}
 
   trigger-pipeline-by-tag:
     name: Trigger Gitlab pipeline by tag
