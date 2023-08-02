@@ -226,5 +226,5 @@ jobs:
           TOKEN: ${{ secrets.GITLAB_TOKEN }}
           LIB_VERSION: ${{ steps.get_version.outputs.version-without-v }}
         run: |
-          curl --request POST --fail --header "PRIVATE-TOKEN: ${TOKEN}" --header "Content-Type: application/json" --data '{"ref": "master", "variables": [{"key": "LIB_VERSION", "value": "'$LIB_VERSION'"}]}' ${URL}
+          curl -v --request POST --fail --header "PRIVATE-TOKEN: ${TOKEN}" --header "Content-Type: application/json" --data '{"ref": "master", "variables": [{"key": "LIB_VERSION", "value": "'$LIB_VERSION'"}]}' ${URL}
 
