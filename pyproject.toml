@@ -16,7 +16,7 @@ classifiers = [
 ]
 dependencies = [
     "kubernetes==25.3.0",
-    "PyYAML==6.0",
+    "PyYAML==6.0.1",
     "hvac==0.8.2",
     "ujson==5.4.0",
     "pydantic==1.10.2",
