@@ -147,11 +147,12 @@ def run(
         console.stage("Scanning manifests..")
         print_kubesec_report(manifests_filename)
 
+        config_kubectl()
+
         console.stage("Diff manifests..")
         print_diff_manifests(tmp_path)
 
         console.stage("Apply manifests..")
-        config_kubectl()
         applied_manifests = kubectl.apply_manifests(manifests_filename)
         console.info(applied_manifests, console.TAB)
 
