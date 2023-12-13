@@ -58,7 +58,6 @@ def apply_manifests(*paths: PathLike, dry_run: bool = False) -> str:
     cmd = (
         f"kubectl apply"
         f" --v={settings.kube_verbosity.value}"
-        f" --record"  # TODO: replace this flag, because it's deprecated
         f" --dry-run={dry_run and 'client' or 'none'}"
         f" {' '.join(f'-f {str(p)}' for p in paths)}"
     )

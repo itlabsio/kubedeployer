@@ -56,7 +56,7 @@ jobs:
       - name: Run integration tests
         run: |
           chmod +x scripts/run_tests.sh
-          ./scripts/run_tests.sh
+          ./scripts/run_tests.sh --rm
 
   create-release:
     name: Create release
